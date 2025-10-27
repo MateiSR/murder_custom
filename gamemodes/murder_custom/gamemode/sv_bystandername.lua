@@ -110,8 +110,9 @@ function GM:LoadBystanderNames()
 end
 
 function EntityMeta:GenerateBystanderName()
-	local words = math.max(1, GAMEMODE.BystanderWords:GetInt())
-	local name = GAMEMODE:GenerateName(words, self.ModelSex or "male")
+	-- local words = math.max(1, GAMEMODE.BystanderWords:GetInt())
+	-- local name = GAMEMODE:GenerateName(words, self.ModelSex or "male")
+	local name = self:Nick()
 	self:SetNWString("bystanderName", name)
 	self.BystanderName = name
 end
@@ -124,7 +125,7 @@ end
 function EntityMeta:GetBystanderName()
 	local name = self:GetNWString("bystanderName")
 	if !name || name == "" then
-		return "Bystander" 
+		return "Bystander"
 	end
 	return name
 end
