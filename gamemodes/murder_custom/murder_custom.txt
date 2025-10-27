@@ -1,10 +1,9 @@
 "Gamemode"
 {
 	"base"			"base"
-	"title"			"Murder"
+	"title"			"MurderCustom"
 	"maps"			"^md_|^mu_|^murder_"
 	"menusystem"		"1"
-	"workshopid" 		"187073946"
 	"version"		"1"
 
 	"settings"
@@ -24,8 +23,8 @@
 			"type"		"Numeric"
 			"default"	"12"
 		}
-		
-		
+
+
 		3
 		{
 			"name"		"mu_delay_after_enough_players"
@@ -33,7 +32,7 @@
 			"type"		"Numeric"
 			"default"	"10"
 		}
-		
+
 		4
 		{
 			"name"		"mu_murder_weight_multiplier"
@@ -113,7 +112,7 @@
 			"type"		"CheckBox"
 			"default"	"1"
 		}
-				
+
 		14
 		{
 			"name"		"mu_scoreboard_show_admins"

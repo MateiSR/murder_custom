@@ -1,10 +1,10 @@
  //-------------------------------------------------------------------------
 //
-// MURDER FGD BY MECHANICAL MIND
+// MURDER CUSTOM FGD MODIFIED BY MateiSR (ORIGINAL BY MECHANICAL MIND)
 //
 //-------------------------------------------------------------------------
 
-@include "base.fgd" 
+@include "base.fgd"
 
 @PointClass base(Targetname, Angles, Shadow, Studiomodel) studioprop()= mu_loot : "Murder Loot Spawn Position"
 [
