@@ -168,12 +168,10 @@ function GM:EndTheRound(reason, murderer)
 		if murderer then
 			local col = murderer:GetPlayerColor()
 			local msgs = Translator:AdvVarTranslate(translate.murdererDisconnectKnown, {
-				murderer = {text = murderer:Nick() .. ", " .. murderer:GetBystanderName(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
+				murderer = {text = murderer:Nick(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
 			})
 			local ct = ChatText(msgs)
 			ct:SendAll()
-			-- ct:Add(", it was ")
-			-- ct:Add(murderer:Nick() .. ", " .. murderer:GetBystanderName(), Color(col.x * 255, col.y * 255, col.z * 255))
 		else
 			local ct = ChatText()
 			ct:Add(translate.murdererDisconnect)
@@ -182,7 +180,7 @@ function GM:EndTheRound(reason, murderer)
 	elseif reason == 2 then
 		local col = murderer:GetPlayerColor()
 		local msgs = Translator:AdvVarTranslate(translate.winBystandersMurdererWas, {
-			murderer = {text = murderer:Nick() .. ", " .. murderer:GetBystanderName(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
+			murderer = {text = murderer:Nick(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
 		})
 		local ct = ChatText()
 		ct:Add(translate.winBystanders, Color(20, 120, 255))
@@ -191,7 +189,7 @@ function GM:EndTheRound(reason, murderer)
 	elseif reason == 1 then
 		local col = murderer:GetPlayerColor()
 		local msgs = Translator:AdvVarTranslate(translate.winMurdererMurdererWas, {
-			murderer = {text = murderer:Nick() .. ", " .. murderer:GetBystanderName(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
+			murderer = {text = murderer:Nick(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
 		})
 		local ct = ChatText()
 		ct:Add(translate.winMurderer, Color(190, 20, 20))
@@ -204,7 +202,7 @@ function GM:EndTheRound(reason, murderer)
 	if murderer then
 		net.WriteEntity(murderer)
 		net.WriteVector(murderer:GetPlayerColor())
-		net.WriteString(murderer:GetBystanderName())
+		net.WriteString(murderer:Nick())
 	else
 		net.WriteEntity(Entity(0))
 		net.WriteVector(Vector(1, 1, 1))
@@ -216,7 +214,6 @@ function GM:EndTheRound(reason, murderer)
 		net.WriteEntity(ply)
 		net.WriteUInt(ply.LootCollected, 32)
 		net.WriteVector(ply:GetPlayerColor())
-		net.WriteString(ply:GetBystanderName())
 	end
 	net.WriteUInt(0, 8)
 

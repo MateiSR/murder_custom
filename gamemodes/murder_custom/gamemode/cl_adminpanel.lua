@@ -58,9 +58,6 @@ local function addPlayerItem(self, mlist, ply, pteam)
 			draw.DrawText(ply:Nick(), "ScoreboardPlayer", s + 11, 9, color_black, 0)
 			draw.DrawText(ply:Nick(), "ScoreboardPlayer", s + 10, 8, color_white, 0)
 
-			draw.DrawText(ply:GetBystanderName(), "ScoreboardPlayer", w * 0.4 + 1, 9, color_black, 0)
-			draw.DrawText(ply:GetBystanderName(), "ScoreboardPlayer", w * 0.4, 8, color_white, 0)
-
 			local status = translate.bystander
 			local statusColor = team.GetColor(2)
 			if !ply:Alive() then
@@ -71,8 +68,8 @@ local function addPlayerItem(self, mlist, ply, pteam)
 				statusColor = Color(190, 20, 20)
 			end
 
-			draw.DrawText(status, "ScoreboardPlayer", w * 0.64 + 1, 9, color_black, 0)
-			draw.DrawText(status, "ScoreboardPlayer", w * 0.64, 8, statusColor, 0)
+			draw.DrawText(status, "ScoreboardPlayer", w * 0.5 + 1, 9, color_black, 0)
+			draw.DrawText(status, "ScoreboardPlayer", w * 0.5, 8, statusColor, 0)
 
 			local chance = "?"
 			if playerData && playerData.players[ply:EntIndex()] then
@@ -152,11 +149,8 @@ local function makeTeamList(parent, pteam)
 		draw.DrawText(translate.scoreboardPing, "ScoreboardPlayer", w - 9, 2, color_black, 2)
 		draw.DrawText(translate.scoreboardPing, "ScoreboardPlayer", w - 10, 2, color_white, 2)
 
-		draw.DrawText(translate.scoreboardBystanderName, "ScoreboardPlayer", w * 0.4 + 1, 2, color_black, 0)
-		draw.DrawText(translate.scoreboardBystanderName, "ScoreboardPlayer", w * 0.4, 2, color_white, 0)
-
-		draw.DrawText(translate.scoreboardStatus, "ScoreboardPlayer", w * 0.64 + 1, 2, color_black, 0)
-		draw.DrawText(translate.scoreboardStatus, "ScoreboardPlayer", w * 0.64, 2, color_white, 0)
+		draw.DrawText(translate.scoreboardStatus, "ScoreboardPlayer", w * 0.5 + 1, 2, color_black, 0)
+		draw.DrawText(translate.scoreboardStatus, "ScoreboardPlayer", w * 0.5, 2, color_white, 0)
 
 		draw.DrawText(translate.scoreboardChance, "ScoreboardPlayer", w * 0.86 + 1, 2, color_black, 0)
 		draw.DrawText(translate.scoreboardChance, "ScoreboardPlayer", w * 0.86, 2, color_white, 0)
@@ -263,4 +257,3 @@ concommand.Add("mu_adminpanel", function (client)
 	net.Start("mu_adminpanel_details")
 	net.SendToServer()
 end)
-

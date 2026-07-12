@@ -238,7 +238,7 @@ function GM:PlayerDeath(ply, Inflictor, attacker )
 				if self.ShowBystanderTKs:GetBool() then
 					local col = attacker:GetPlayerColor()
 					local msgs = Translator:AdvVarTranslate(translate.killedTeamKill, {
-						player = {text = attacker:Nick() .. ", " .. attacker:GetBystanderName(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
+						player = {text = attacker:Nick(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
 					})
 					local ct = ChatText()
 					ct:AddParts(msgs)
@@ -251,7 +251,7 @@ function GM:PlayerDeath(ply, Inflictor, attacker )
 		if attacker != ply && IsValid(attacker) && attacker:IsPlayer() then
 			local col = attacker:GetPlayerColor()
 			local msgs = Translator:AdvVarTranslate(translate.killedMurderer, {
-				player = {text = attacker:Nick() .. ", " .. attacker:GetBystanderName(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
+				player = {text = attacker:Nick(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
 			})
 			local ct = ChatText()
 			ct:AddParts(msgs)

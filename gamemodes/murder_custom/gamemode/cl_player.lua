@@ -13,7 +13,7 @@ end
 function EntityMeta:GetBystanderName()
 	local name = self:GetNWString("bystanderName")
 	if !name || name == "" then
-		return "Bystander" 
+		return self:IsPlayer() and self:Nick() or "Bystander"
 	end
 	return name
 end

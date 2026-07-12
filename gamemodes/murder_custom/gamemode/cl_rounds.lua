@@ -64,7 +64,6 @@ net.Receive("DeclareWinner" , function (length)
 		end
 		t.count = net.ReadUInt(32)
 		t.playerColor = net.ReadVector()
-		t.playerBystanderName = net.ReadString()
 		table.insert(data.collectedLoot, t)
 	end
 
