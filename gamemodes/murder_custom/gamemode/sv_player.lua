@@ -1,4 +1,23 @@
 util.AddNetworkString("mu_death")
+util.AddNetworkString("mu_weapon_variant")
+
+local variantWeapons = {
+	[0] = "weapon_mu_knife",
+	[1] = "weapon_mu_magnum"
+}
+
+net.Receive("mu_weapon_variant", function (len, ply)
+	local class = variantWeapons[net.ReadUInt(1)]
+	local index = net.ReadUInt(8)
+	local stored = class && weapons.GetStored(class)
+	local variant = stored && stored.Variants && stored.Variants[index]
+	if !variant || !util.IsValidModel(variant.view) || !util.IsValidModel(variant.world) then return end
+
+	local weapon = ply:GetWeapon(class)
+	if IsValid(weapon) then
+		weapon:SetVariant(index)
+	end
+end)
 
 local PlayerMeta = FindMetaTable("Player")
 local EntityMeta = FindMetaTable("Entity")

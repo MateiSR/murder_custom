@@ -6,6 +6,7 @@ else
 end
 
 SWEP.Base = "weapon_mers_base"
+SWEP.VariantConVar = "mu_magnum_variant"
 SWEP.Slot = 1
 SWEP.SlotPos = 1
 SWEP.DrawAmmo = true

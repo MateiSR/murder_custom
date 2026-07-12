@@ -98,19 +98,24 @@ end
 
 function SWEP:Initialize()
 	if SERVER && self.Variants && self:GetVariant() == 0 then
-		local available = {}
-		for index, variant in ipairs(self.Variants) do
-			if util.IsValidModel(variant.view) && util.IsValidModel(variant.world) then
-				table.insert(available, index)
-			end
-		end
-		self:SetVariant(table.Random(available) or 1)
+		self:SetVariant(1)
 	end
 	self:ApplyVariant()
 	self:SetWeaponState("holster")
 	self:CalculateHoldType()
 	self.HolsterPercent = 1
 	self.IronsightsPercent = 0
+end
+
+function SWEP:Equip(owner)
+	if !SERVER || !self.VariantConVar || !self.Variants || !IsValid(owner) || !owner:IsPlayer() then return end
+
+	local index = owner:GetInfoNum(self.VariantConVar, 1)
+	local variant = self.Variants[index]
+	if !variant || !util.IsValidModel(variant.view) || !util.IsValidModel(variant.world) then
+		index = 1
+	end
+	self:SetVariant(index)
 end
 
 function SWEP:SetNetHoldType(name)

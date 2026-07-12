@@ -7,6 +7,11 @@ pt.magnum = "Magnum"
 pt.gun = "Gun"
 pt.hands = "Hands"
 
+pt.weaponPickerTitle = "Weapon selection"
+pt.weaponPickerHelp = "Your choices are saved for future rounds."
+pt.weaponPickerKnife = "Murderer weapon"
+pt.weaponPickerMagnum = "Bystander weapon"
+
 
 pt.teamSpectators = "Spectators"
 pt.teamPlayers = "Players"

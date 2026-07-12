@@ -21,6 +21,7 @@ Misc
 	mu_jointeam <team> - Trys to join the specified team
 	mu_print_players - Prints all the players and Steam IDs
 	mu_adminpanel - Brings up an admin panel where you can view information
+	mu_weapon_menu - Opens the weapon cosmetic selection menu
 
 Server ConVars
 	mu_language <lang> - The language Murder should use
@@ -42,6 +43,8 @@ Server ConVars
 	mu_roundlimit <number> - Number of rounds we should play before map change
 
 Client ConVars
+	mu_knife_variant <number> - Saved murderer weapon cosmetic
+	mu_magnum_variant <number> - Saved bystander weapon cosmetic
 	mu_debug <0/1> - Shows debug information
 	mu_footstep_maxlifetime <time> - The number of seconds footsteps should last for, caps at 30
 	mu_halo_knife <0/1> - Should we render murderer's knife halos

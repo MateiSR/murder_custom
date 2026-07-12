@@ -8,7 +8,7 @@ Use this guide to find the owner of a behavior. Read the start file, its paired 
 | --- | --- | --- | --- |
 | Round lifecycle and map rotation | `gamemode/sv_rounds.lua` | `cl_rounds.lua`, `cl_endroundboard.lua`, `weightedrandom.lua` | State transitions, win checks, murderer selection, round limit, map list |
 | Murderer state and reveal | `gamemode/sv_murderer.lua` | `cl_murderer.lua` | Role flag, weighted chance reset, fog reveal, lost-knife recovery |
-| Player lifecycle | `gamemode/sv_player.lua` | `cl_player.lua` | Join/spawn, teams, models, loadout, death, pickup, chat/voice visibility |
+| Player lifecycle | `gamemode/sv_player.lua` | `cl_player.lua` | Join/spawn, teams, models, loadout, weapon-cosmetic picker, death, pickup, chat/voice visibility |
 | Bystander identity | `gamemode/sv_bystandername.lua` | Player state consumed by HUD/scoreboard | Generated names and admin player listing |
 | Team-kill penalty | `gamemode/sv_tker.lua` plus `sv_player.lua` | `cl_init.lua` | Penalty state and weapon restrictions |
 | Spectating | `gamemode/sv_spectate.lua` | `cl_spectate.lua` | Custom target/mode selection and client display |
@@ -55,7 +55,7 @@ The data locations and precedence rules are documented in [Data and localization
 
 Weapon files are shared and branch internally on `SERVER`/`CLIENT`. Preserve prediction and lag-compensation paths when changing attacks. World behavior for a thrown/dropped object belongs in its entity, not only in the SWEP.
 
-Variants remain instances of `weapon_mu_knife` or `weapon_mu_magnum`; role restrictions, loot rewards, halos, drops, and team-kill penalties therefore continue using the existing class checks. Add a variant to the owning SWEP's `SWEP.Variants` table and add any new Workshop item ID to the download list in `gamemode/init.lua`.
+Variants remain instances of `weapon_mu_knife` or `weapon_mu_magnum`; role restrictions, loot rewards, halos, drops, and team-kill penalties therefore continue using the existing class checks. Players choose archived preferences through `cl_player.lua`; `weapon_mers_base.lua` validates and applies them when the weapon is equipped. Add a variant to the owning SWEP's `SWEP.Variants` table and add any new Workshop item ID to the download list in `gamemode/init.lua`.
 
 ## Translation
 
