@@ -25,7 +25,7 @@ Claude Code loads the complete guide set through these imports. Other agents sho
 | Startup, load order, realm, or network change | [Architecture](architecture.md) | `gamemodes/murder_custom/gamemode/init.lua`, `cl_init.lua`, `shared.lua` |
 | Round, role, player, UI, entity, or weapon behavior | [Subsystems](subsystems.md) | Matching subsystem row in that guide |
 | Map loot/spawns, translations, or assets | [Data and localization](data.md) | `data_static/murder/`, `gamemode/lang/`, or `content/` |
-| Command, ConVar, validation, package, or release work | [Development and release](development.md) | `commands.txt`, `pack.ps1`, `publish.ps1`, `addon.json` |
+| Command, ConVar, validation, package, or release work | [Development and release](development.md) | `commands.txt`, `pack.ps1`/`pack.sh`, `publish.ps1`/`publish.sh`, `addon.json` |
 | New, removed, or renamed subsystem/path | All affected guides | Update this index as part of the same change |
 
 ## Repository at a glance
@@ -38,7 +38,7 @@ Claude Code loads the complete guide set through these imports. Other agents sho
 | `gamemodes/murder_custom/content/` | Shipped materials and resource localization |
 | `data_static/murder/` | Bundled per-map loot and spawn data |
 | `addon.json` | Workshop addon metadata |
-| `pack.ps1`, `publish.ps1` | Package and Workshop release scripts |
+| `pack.ps1`/`pack.sh`, `publish.ps1`/`publish.sh` | Windows and Linux package/Workshop release scripts |
 
 ## Documentation rule
 

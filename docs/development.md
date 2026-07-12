@@ -5,7 +5,10 @@
 - Garry's Mod capable of loading the repository as an addon/gamemode.
 - Counter-Strike: Source owned, installed, and mounted for required content.
 - A server/client session for meaningful gameplay verification.
-- Windows PowerShell and Garry's Mod `gmad.exe`/`gmpublish.exe` at the paths expected by the release scripts when packaging.
+- On Windows: PowerShell and Garry's Mod `gmad.exe`/`gmpublish.exe`.
+- On Linux: a POSIX shell, standard `find`/`cp` tools, and Garry's Mod's Linux GMad/GMPublish binaries.
+
+The release scripts expect the repository at `GarrysMod/garrysmod/addons/<addon>`: the Garry's Mod `bin/` directory must therefore be three directories above the repository. On Linux, the scripts detect the tools in `bin/linux64`, `bin/linux32`, and the legacy `bin/gmad_linux`/`bin/gmpublish_linux` locations.
 
 There is no package manager, dependency-install step, automated test suite, or repository-defined linter.
 
@@ -64,11 +67,11 @@ When adding or changing a public command or ConVar:
 
 ## Packaging
 
-`pack.ps1`:
+`pack.ps1` (Windows) and `pack.sh` (Linux):
 
-1. deletes and recreates the local `pack/` staging directory;
-2. copies addon content while excluding VCS/development files such as Markdown, PowerShell, GMA, and license files;
-3. invokes `gmad.exe create` to produce `packed.gma`.
+1. delete and recreate the local `pack/` staging directory;
+2. copy addon content while excluding VCS/development files such as Markdown, release scripts, GMA, and license files;
+3. invoke the platform's GMad tool to produce `packed.gma`.
 
 Run from the repository root in the expected Garry's Mod directory layout:
 
@@ -76,15 +79,25 @@ Run from the repository root in the expected Garry's Mod directory layout:
 ./pack.ps1
 ```
 
-The script is destructive only to its generated `pack/` directory.
+```sh
+./pack.sh
+```
+
+Each script is destructive only to its generated `pack/` directory.
 
 ## Publishing
 
-`publish.ps1` invokes `gmpublish.exe update` with `packed.gma` and the fixed Workshop item ID `187073946`:
+`publish.ps1` (Windows) and `publish.sh` (Linux) invoke GMPublish with `packed.gma`. Both require the numeric Workshop item ID explicitly; replace the example ID with one owned by the publishing Steam account:
 
 ```powershell
-./publish.ps1
+./publish.ps1 -WorkshopId 1234567890
 ```
+
+```sh
+./publish.sh 1234567890
+```
+
+The Linux scripts set `LD_LIBRARY_PATH` to the selected tool directory and Garry's Mod `bin/` so the shipped Steam libraries can be found.
 
 Publishing mutates the live Workshop item. Run it only when the user explicitly intends a release and only after a successful package plus runtime verification. `addon.json` supplies the addon title, type, and tags used for packaging.
 
