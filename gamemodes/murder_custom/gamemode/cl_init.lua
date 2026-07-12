@@ -32,6 +32,8 @@ GM.FogEmitters = {}
 if GAMEMODE then GM.FogEmitters = GAMEMODE.FogEmitters end
 function GM:Think()
 	for k, ply in pairs(player.GetAll()) do
+		self:ApplyMurderDisguiseModel(ply)
+
 		if ply:Alive() && ply:GetNWBool("MurdererFog") then
 			if !ply.FogEmitter then
 				ply.FogEmitter = ParticleEmitter(ply:GetPos())
@@ -44,7 +46,7 @@ function GM:Think()
 
 			if ply.FogNextPart < CurTime() then
 
-				if client:GetPos():Distance(pos) > 1000 then return end
+				if client:GetPos():Distance(pos) > 1000 then continue end
 
 				ply.FogEmitter:SetPos(pos)
 				ply.FogNextPart = CurTime() + math.Rand(0.01, 0.03)

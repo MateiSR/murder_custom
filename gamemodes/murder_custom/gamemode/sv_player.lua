@@ -560,6 +560,8 @@ function PlayerMeta:MurdererDisguise(copyent)
 	if GAMEMODE.CanDisguise:GetBool() then
 		self.Disguised = true
 		self.DisguisedStart = CurTime()
+		self:SetNWString("murderDisguiseOriginalModel", self.DisguiseModel)
+		self:SetNWString("murderDisguiseModel", copyent:GetModel())
 		self:SetModel(copyent:GetModel())
 		self:SetPlayerColor(copyent:GetPlayerColor())
 		self:SetupHands()
@@ -569,6 +571,7 @@ function PlayerMeta:MurdererDisguise(copyent)
 end
 
 function PlayerMeta:UnMurdererDisguise()
+	self:SetNWString("murderDisguiseModel", "")
 	if self.Disguised then
 		self:SetPlayerColor(self.DisguiseColor)
 		if self.DisguiseModel then

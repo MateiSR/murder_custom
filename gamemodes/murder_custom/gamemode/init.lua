@@ -127,6 +127,12 @@ function GM:Think()
 		if ply.LastTKTime && ply.LastTKTime + self:GetTKPenaltyTime() < CurTime() then
 			ply:SetTKer(false)
 		end
+		// keep the disguise model applied if another addon reverts it
+		local disguiseModel = ply:GetNWString("murderDisguiseModel")
+		if disguiseModel != "" && ply:GetModel() != disguiseModel then
+			ply:SetModel(disguiseModel)
+			ply:SetupHands()
+		end
 	end
 end
 
