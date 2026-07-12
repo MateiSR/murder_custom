@@ -48,6 +48,8 @@ surface.CreateFont( "MersDeathBig" , {
 	italic = false
 })
 
+GM.RoundStartUnfreezeTime = 10
+
 local function drawTextShadow(t,f,x,y,c,px,py)
 	color_black.a = c.a
 	draw.SimpleText(t,f,x + 1,y + 1,color_black,px,py)
@@ -82,7 +84,7 @@ function GM:HUDPaint()
 		else
 
 			if round == 1 then
-				if self.RoundStart && self.RoundStart + 10 > CurTime() then
+				if self.RoundStart && self.RoundStart + self.RoundStartUnfreezeTime > CurTime() then
 					self:DrawStartRoundInformation()
 				else
 					self:DrawGameHUD(LocalPlayer())
@@ -354,7 +356,7 @@ function GM:RenderScreenspaceEffects()
 		self:RenderDeathOverlay()
 	end
 
-	if self:GetRound() == 1 && self.RoundStart && self.RoundStart + 10 > CurTime() then
+	if self:GetRound() == 1 && self.RoundStart && self.RoundStart + self.RoundStartUnfreezeTime > CurTime() then
 		local sw, sh = ScrW(), ScrH()
 		surface.SetDrawColor(0,0,0,255)
 		surface.DrawRect(-1,-1,sw + 2,sh + 2)

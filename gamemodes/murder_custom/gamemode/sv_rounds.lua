@@ -44,6 +44,8 @@ function GM:NetworkRound(ply)
 		net.WriteDouble(self.StartNewRoundTime)
 	end
 
+	net.WriteFloat(self.RoundStartUnfreezeTime:GetFloat())
+
 	if ply == nil then
 		net.Broadcast()
 	else
@@ -272,7 +274,8 @@ function GM:StartNewRound()
 	ct:Add(translate.roundStarted)
 	ct:SendAll()
 
-	self.RoundUnFreezePlayers = CurTime() + 10
+	local roundStartUnfreezeTime = self.RoundStartUnfreezeTime:GetFloat()
+	self.RoundUnFreezePlayers = CurTime() + roundStartUnfreezeTime
 
 	local players = team.GetPlayers(2)
 	for k,ply in pairs(players) do
