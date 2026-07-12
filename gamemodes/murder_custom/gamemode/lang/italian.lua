@@ -104,6 +104,6 @@ pt.startHelpMurderer = {
 pt.murdererFog = "La tua presenza maligna si sta mostrando"
 pt.murdererFogSub = "Uccidi qualcuno per nasconderla"
 
-pt.pressEToDisguiseFor1Loot = "[E] Camuffa per 1 oggetto"
+pt.pressEToDisguise = "[E] Camuffa"
 
 pt.playerStatusDead = "Morto"

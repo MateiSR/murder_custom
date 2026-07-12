@@ -104,7 +104,7 @@ pt.startHelpMurderer = {
 pt.murdererFog = "당신의 사악한 본능을 더이상 숨길수 없습니다."
 pt.murdererFogSub = "누군가를 죽여서 사악한 본능을 억제하세요."
 
-pt.pressEToDisguiseFor1Loot = "[E] 키를 눌러 단서 1개를 사용해 변장"
+pt.pressEToDisguise = "[E] 키를 눌러 변장"
 
 pt.playerStatusDead = "사망"
 

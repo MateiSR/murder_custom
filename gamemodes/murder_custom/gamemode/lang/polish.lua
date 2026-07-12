@@ -105,6 +105,6 @@ pt.startHelpMurderer = {
 pt.murdererFog = "Twoje zÅ‚o wewnÄ™trzne jest widoczne"
 pt.murdererFogSub = "Zabij kogokolwiek, aby je ukryÄ‡"
 
-pt.pressEToDisguiseFor1Loot = "[E] - przebierz siÄ™ w zamian za 1 przedmiot"
+pt.pressEToDisguise = "[E] - przebierz siÄ™"
 
 pt.playerStatusDead = "Martwy"

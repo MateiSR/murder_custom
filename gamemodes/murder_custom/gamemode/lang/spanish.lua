@@ -104,6 +104,6 @@ pt.startHelpMurderer = {
 pt.murdererFog = "Tu presencia malvada se puede ver"
 pt.murdererFogSub = "Mata a alguien para esconderte"
 
-pt.pressEToDisguiseFor1Loot = "[E] Disfrázate como por 1 botín"
+pt.pressEToDisguise = "[E] Disfrázate"
 
 pt.playerStatusDead = "Muerto"

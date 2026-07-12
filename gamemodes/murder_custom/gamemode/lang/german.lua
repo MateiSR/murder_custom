@@ -104,6 +104,6 @@ pt.startHelpMurderer = {
 pt.murdererFog = "Deine dunkle Seite kommt zum Vorschein!"
 pt.murdererFogSub = "Töte jemanden, um sie zu verbergen!"
 
-pt.pressEToDisguiseFor1Loot = "[E] Für 1 Gegenstand verkleiden"
+pt.pressEToDisguise = "[E] Verkleiden"
 
 pt.playerStatusDead = "Tot"

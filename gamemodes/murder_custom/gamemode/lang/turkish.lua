@@ -106,7 +106,7 @@ pt.startHelpMurderer = {
 pt.murdererFog = "Şeytani varlığın kendini gösteriyor."
 pt.murdererFogSub = "Gizlenmek için birini öldürmelisin."
 
-pt.pressEToDisguiseFor1Loot = "[E] 1 ganimet karşılığı kılık değiştir."
+pt.pressEToDisguise = "[E] Kılık değiştir."
 
 pt.playerStatusDead = "Ölü"
 

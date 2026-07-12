@@ -114,7 +114,7 @@ pt.startHelpMurderer = {
 pt.murdererFog = "Ваша злая сущность стала видимой"
 pt.murdererFogSub = "Убейте кого-нибудь, чтобы спрятаться"
 
-pt.pressEToDisguiseFor1Loot = "[E] Замаскироваться за 1 улику"
+pt.pressEToDisguise = "[E] Замаскироваться"
 
 pt.playerStatusDead = "Мёртв"
 

@@ -105,7 +105,7 @@ pt.startHelpMurderer = {
 pt.murdererFog = "您的邪惡氣息外洩"
 pt.murdererFogSub = "殺一個人來隱藏"
 
-pt.pressEToDisguiseFor1Loot = "[E] 偽裝成另一個樣貌"
+pt.pressEToDisguise = "[E] 偽裝成另一個樣貌"
 
 pt.playerStatusDead = "死亡"
 

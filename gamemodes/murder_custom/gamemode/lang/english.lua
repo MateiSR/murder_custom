@@ -111,7 +111,7 @@ pt.startHelpMurderer = {
 pt.murdererFog = "Your evil presence is showing"
 pt.murdererFogSub = "Kill someone to hide"
 
-pt.pressEToDisguiseFor1Loot = "[E] Disguise as for 1 loot"
+pt.pressEToDisguise = "[E] Disguise"
 
 pt.playerStatusDead = "Dead"
 

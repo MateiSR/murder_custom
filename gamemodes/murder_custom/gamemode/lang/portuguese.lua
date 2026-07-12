@@ -105,7 +105,7 @@ pt.startHelpMurderer = {
 pt.murdererFog = "Sua presença maliguina está aparecendo!"
 pt.murdererFogSub = "Mate alguem para se esconder"
 
-pt.pressEToDisguiseFor1Loot = "[E] Se disfarce como por 1 de loot"
+pt.pressEToDisguise = "[E] Se disfarce"
 
 pt.playerStatusDead = "Morto"
 
