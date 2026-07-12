@@ -45,15 +45,17 @@ The data locations and precedence rules are documented in [Data and localization
 
 | Path | Responsibility |
 | --- | --- |
-| `entities/weapons/weapon_mers_base.lua` | Shared scripted-weapon behavior used by Murder weapons |
+| `entities/weapons/weapon_mers_base.lua` | Shared scripted-weapon behavior and networked cosmetic-variant application used by Murder weapons |
 | `entities/weapons/weapon_mu_hands.lua` | Unarmed player weapon |
-| `entities/weapons/weapon_mu_knife.lua` | Murderer melee attack and charged throw |
-| `entities/weapons/weapon_mu_magnum.lua` | Bystander revolver |
-| `entities/entities/mu_knife/` | Thrown knife world entity |
+| `entities/weapons/weapon_mu_knife.lua` | Murderer melee attack, charged throw, and expandable knife variant catalog |
+| `entities/weapons/weapon_mu_magnum.lua` | Bystander one-shot weapon behavior and expandable visual/sound variant catalog |
+| `entities/entities/mu_knife/` | Thrown knife world entity; preserves the originating knife variant through recovery |
 | `entities/entities/mu_loot/` | Collectible loot world entity |
 | `entities/entities/ttt_traitor_button/` | Compatibility with map-authored TTT traitor buttons |
 
 Weapon files are shared and branch internally on `SERVER`/`CLIENT`. Preserve prediction and lag-compensation paths when changing attacks. World behavior for a thrown/dropped object belongs in its entity, not only in the SWEP.
+
+Variants remain instances of `weapon_mu_knife` or `weapon_mu_magnum`; role restrictions, loot rewards, halos, drops, and team-kill penalties therefore continue using the existing class checks. Add a variant to the owning SWEP's `SWEP.Variants` table and add any new Workshop item ID to the download list in `gamemode/init.lua`.
 
 ## Translation
 

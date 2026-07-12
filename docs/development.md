@@ -85,6 +85,26 @@ Run from the repository root in the expected Garry's Mod directory layout:
 
 Each script is destructive only to its generated `pack/` directory.
 
+## Runtime Workshop dependencies
+
+Random weapon cosmetics use these Garry's Mod Workshop addons:
+
+| ID | Content used |
+| --- | --- |
+| `3140497953` | Butterfly Knife Emerald |
+| `887833744` | Karambit Black Steel, Doppler, and Marble Fade |
+| `3253745052` | Stiletto Knife |
+| `1919238032` | M9 Bayonet Apophysis Fade |
+| `1323286207` | Hunting Bow |
+| `3282915356` | Minecraft Bow replacement |
+| `1629312994` | Desert Eagle Blaze |
+| `734953738` | USP-S Orion material replacement |
+| `726752951` | Five-SeveN Monkey Business |
+
+`resource.AddWorkshop` in `gamemode/init.lua` makes clients download individual items; it does not install them on the dedicated server. Put the same items in the collection passed through `+host_workshop_collection <collectionID>` so server-side model validation can enable them. Missing addon-specific models are excluded from random selection and the stock knife/magnum remain available.
+
+For another variant, first inspect the addon rather than guessing paths: confirm it is an Addon rather than a save/demo, audit its Lua because mounted dependencies execute, and verify view/world models plus every configured animation sequence. Then add its item ID in `gamemode/init.lua` and its catalog entry in the owning SWEP. Avoid copying or republishing another Workshop addon's files.
+
 ## Publishing
 
 `publish.ps1` (Windows) and `publish.sh` (Linux) invoke GMPublish with `packed.gma`. Both require the numeric Workshop item ID explicitly; replace the example ID with one owned by the publishing Steam account:

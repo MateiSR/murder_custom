@@ -5,7 +5,11 @@ include('shared.lua')
 
 
 function ENT:Initialize()
-	self:SetModel("models/weapons/w_knife_t.mdl")
+	local weapon = weapons.GetStored("weapon_mu_knife")
+	local variant = weapon && weapon.Variants && (weapon.Variants[self:GetVariant()] or weapon.Variants[1])
+	self:SetModel(variant && variant.world or "models/weapons/w_knife_t.mdl")
+	self:SetSkin(variant && variant.skin or 0)
+	self:SetMaterial(variant && variant.material or "")
 
 	self:PhysicsInit( SOLID_VPHYSICS )
 	-- self:PhysicsInitSphere(50)
@@ -39,6 +43,7 @@ function ENT:Think()
 	if self.HitSomething && self:GetVelocity():Length2D() < 1.5 then
 		self.HitSomething = false
 		local knife = ents.Create("weapon_mu_knife")
+		knife:SetVariant(self:GetVariant())
 		knife:SetPos(self:GetPos())
 		knife:SetAngles(self:GetAngles())
 		knife:Spawn()
@@ -115,4 +120,3 @@ function ENT:PhysicsCollide( data, physobj )
 
 	self.HitSomething = true
 end
-

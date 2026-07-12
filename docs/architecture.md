@@ -77,6 +77,8 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 | `TTT_ConfirmUseTButton` | `entities/entities/ttt_traitor_button/init.lua` | `shared.lua` client branch in the same entity | Successful map-button feedback |
 | `translator_language` | `sh_translate.lua` server branch | Same file, client branch | Selected gameplay language |
 
+`weapon_mers_base.lua` also defines an integer `Variant` network variable for its SWEP instances. The server selects an available cosmetic variant and clients apply the matching view model, world model, skin, material, animations, and sounds. The thrown `mu_knife` entity carries its own integer `Variant` so throwing and recovering a knife preserves its appearance.
+
 Find every registration, sender, and receiver with:
 
 ```sh

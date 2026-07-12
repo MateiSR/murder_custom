@@ -37,6 +37,21 @@ include("sv_flashlight.lua")
 resource.AddFile("materials/thieves/footprint.vmt")
 resource.AddFile("materials/murder/melon_logo_scoreboard.png")
 
+local weaponWorkshopItems = {
+	"3140497953", // Butterfly Knife Emerald
+	"887833744",  // Karambit skins
+	"3253745052", // Stiletto Knife
+	"1919238032", // M9 Bayonet Apophysis Fade
+	"1323286207", // Hunting Bow
+	"3282915356", // Minecraft Bow replacement
+	"1629312994", // Desert Eagle Blaze
+	"734953738",  // USP-S Orion
+	"726752951"   // Five-SeveN Monkey Business
+}
+for k, workshopID in ipairs(weaponWorkshopItems) do
+	resource.AddWorkshop(workshopID)
+end
+
 GM.RoundStartUnfreezeTime = CreateConVar("mu_roundstart_unfreezetime", 10, bit.bor(FCVAR_NOTIFY), "Time (in seconds) it takes for the round start screen to be hidden and players able to move around")
 GM.SpectateDelayAfterDeath = CreateConVar("mu_spectate_delay_after_death", 4, bit.bor(FCVAR_NOTIFY), "Duration (in seconds) of the \"black screen\" effect after dying", 0, 255)
 GM.ShowBystanderTKs = CreateConVar("mu_show_bystander_tks", 1, bit.bor(FCVAR_NOTIFY), "Should show name of killer in chat on a bystander team kill" )

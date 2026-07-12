@@ -15,6 +15,87 @@ SWEP.ViewModel = "models/weapons/c_357.mdl"
 SWEP.WorldModel = "models/weapons/w_357.mdl"
 SWEP.ViewModelFlip = false
 
+SWEP.Variants = {
+	{
+		name = "Magnum",
+		view = "models/weapons/c_357.mdl",
+		world = "models/weapons/w_357.mdl",
+		fov = 50,
+		hold = "revolver",
+		draw = "draw",
+		idle = "idle01",
+		attack = "fire",
+		reload = "reload",
+		sound = "Weapon_357.Single",
+		reloadSound = "Weapon_357.Reload"
+	},
+	{
+		name = "Hunting Bow",
+		view = "models/weapons/v_huntingbow.mdl",
+		world = "models/weapons/w_huntingbow.mdl",
+		fov = 68,
+		hold = "crossbow",
+		draw = "draw",
+		idle = "idle_armed",
+		attack = "shoot",
+		reload = "lowered_to_idle",
+		sound = "weapons/huntingbow/shoot_1.wav",
+		reloadSound = "weapons/huntingbow/nock_1.wav"
+	},
+	{
+		name = "Minecraft Bow",
+		view = "models/weapons/c_crossbow.mdl",
+		world = "models/weapons/w_crossbow.mdl",
+		fov = 73,
+		hold = "crossbow",
+		draw = "deploy",
+		idle = "idle",
+		attack = "fire",
+		reload = "reload",
+		sound = "weapons/crossbow/fire1.wav",
+		reloadSound = "weapons/crossbow/reload1.wav"
+	},
+	{
+		name = "Desert Eagle Blaze",
+		view = "models/weapons/v_glax_deagle.mdl",
+		world = "models/weapons/w_glax_deagle.mdl",
+		fov = 70,
+		hold = "pistol",
+		draw = "draw",
+		idle = "idle1",
+		attack = "shoot1",
+		reload = "reload",
+		sound = "weapons/glagle/deagle-1.wav",
+		reloadSound = "weapons/glagle/de_clipin.wav"
+	},
+	{
+		name = "USP-S Orion",
+		view = "models/weapons/v_pist_usp.mdl",
+		world = "models/weapons/w_pist_usp_silencer.mdl",
+		fov = 60,
+		hold = "pistol",
+		draw = "draw",
+		idle = "idle",
+		attack = "shoot1",
+		reload = "reload",
+		sound = "weapons/usp/usp1.wav",
+		reloadSound = "weapons/usp/usp_clipin.wav"
+	},
+	{
+		name = "Five-SeveN Monkey Business",
+		view = "models/weapons/c_csgo_fn.mdl",
+		world = "models/weapons/csgo_world/w_pist_fiveseven.mdl",
+		fov = 45,
+		hold = "pistol",
+		draw = "draw",
+		idle = "idle",
+		attack = "shoot1",
+		reload = "reload",
+		sound = "csgo/fiveseven/fiveseven-1.wav",
+		reloadSound = "csgo/fiveseven/fiveseven_clipin.wav"
+	}
+}
+
 SWEP.HoldType = "revolver"
 SWEP.SequenceDraw = "draw"
 SWEP.SequenceIdle = "idle01"
@@ -56,4 +137,3 @@ function SWEP:DoPrimaryAttackEffect(stats)
 	bullet.Damage = stats.damage or 1
 	self.Owner:FireBullets(bullet)
 end
-	

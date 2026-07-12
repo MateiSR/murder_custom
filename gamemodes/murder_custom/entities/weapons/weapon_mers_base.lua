@@ -51,7 +51,62 @@ SWEP.Secondary.DefaultClip	= 0
 SWEP.Secondary.Automatic	= false
 SWEP.Secondary.Ammo			= "none"
 
+function SWEP:GetVariantInfo(index)
+	if !self.Variants then return end
+	return self.Variants[index or self:GetVariant()] or self.Variants[1]
+end
+
+function SWEP:ApplyVariant(index)
+	local variant = self:GetVariantInfo(index)
+	if !variant then return end
+
+	if !self.VariantPrimaryCopied then
+		self.Primary = table.Copy(self.Primary)
+		self.VariantPrimaryCopied = true
+	end
+
+	self.ViewModel = variant.view
+	self.WorldModel = variant.world
+	self.ViewModelFOV = variant.fov
+	self.ViewModelFlip = variant.flip or false
+	self.HoldType = variant.hold
+	self.SequenceDraw = variant.draw
+	self.SequenceIdle = variant.idle
+	self.Primary.Sequence = variant.attack
+	self.Primary.Sound = variant.sound
+	self.ReloadSequence = variant.reload
+	self.ReloadSound = variant.reloadSound
+
+	self:SetModel(variant.world)
+	self:SetSkin(variant.skin or 0)
+	self:SetMaterial(variant.material or "")
+
+	local owner = self:GetOwner()
+	if IsValid(owner) then
+		local vm = owner:GetViewModel()
+		if IsValid(vm) then
+			vm:SetWeaponModel(variant.view, self)
+			vm:SetSkin(variant.skin or 0)
+			vm:SetMaterial(variant.material or "")
+		end
+	end
+end
+
+function SWEP:OnVariantChanged(name, old, new)
+	self:ApplyVariant(new)
+end
+
 function SWEP:Initialize()
+	if SERVER && self.Variants && self:GetVariant() == 0 then
+		local available = {}
+		for index, variant in ipairs(self.Variants) do
+			if util.IsValidModel(variant.view) && util.IsValidModel(variant.world) then
+				table.insert(available, index)
+			end
+		end
+		self:SetVariant(table.Random(available) or 1)
+	end
+	self:ApplyVariant()
 	self:SetWeaponState("holster")
 	self:CalculateHoldType()
 	self.HolsterPercent = 1
@@ -85,6 +140,10 @@ function SWEP:SetupDataTables()
 	self:NetworkVar("Float", 0, "ReloadEnd")
 	self:NetworkVar("Float", 1, "NextIdle")
 	self:NetworkVar("Float", 2, "DrawEnd")
+	self:NetworkVar("Int", 0, "Variant")
+	if self.Variants then
+		self:NetworkVarNotify("Variant", self.OnVariantChanged)
+	end
 end
 
 function SWEP:IsIdle()
@@ -219,6 +278,7 @@ function SWEP:Reload()
 end
 
 function SWEP:Deploy()
+	self:ApplyVariant()
 	self:SetWeaponState("normal")
 	self:CalculateHoldType()
 	local time = 1
@@ -237,6 +297,14 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster(newWep)
+	local owner = self:GetOwner()
+	if IsValid(owner) then
+		local vm = owner:GetViewModel()
+		if IsValid(vm) then
+			vm:SetSkin(0)
+			vm:SetMaterial("")
+		end
+	end
 	return true
 end
 

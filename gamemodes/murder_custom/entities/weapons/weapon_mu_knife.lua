@@ -62,6 +62,83 @@ SWEP.WorldModel = "models/weapons/w_knife_t.mdl"
 SWEP.ViewModelFlip = false
 SWEP.ViewModelFOV = 65
 
+SWEP.Variants = {
+	{
+		name = "Default",
+		view = "models/weapons/v_knife_t.mdl",
+		world = "models/weapons/w_knife_t.mdl",
+		fov = 65,
+		hold = "knife",
+		draw = "draw",
+		idle = "idle",
+		attack = {"midslash1", "midslash2"}
+	},
+	{
+		name = "Butterfly Emerald",
+		view = "models/weapons2/v_tene_butterfly.mdl",
+		world = "models/weapons2/w_tene_butterfly.mdl",
+		fov = 70,
+		hold = "knife",
+		draw = "draw",
+		idle = "idle1",
+		attack = {"light_miss1", "light_miss2"}
+	},
+	{
+		name = "Karambit Black Steel",
+		view = "models/weapons/v_csgo_karambit.mdl",
+		world = "models/weapons/w_csgo_karambit.mdl",
+		skin = 11,
+		fov = 65,
+		hold = "knife",
+		draw = "draw",
+		idle = "idle1",
+		attack = {"light_miss1", "light_miss2"}
+	},
+	{
+		name = "Karambit Doppler",
+		view = "models/weapons/v_csgo_karambit.mdl",
+		world = "models/weapons/w_csgo_karambit.mdl",
+		skin = 2,
+		fov = 65,
+		hold = "knife",
+		draw = "draw",
+		idle = "idle1",
+		attack = {"light_miss1", "light_miss2"}
+	},
+	{
+		name = "Karambit Marble Fade",
+		view = "models/weapons/v_csgo_karambit.mdl",
+		world = "models/weapons/w_csgo_karambit.mdl",
+		skin = 4,
+		fov = 65,
+		hold = "knife",
+		draw = "draw",
+		idle = "idle1",
+		attack = {"light_miss1", "light_miss2"}
+	},
+	{
+		name = "Stiletto",
+		view = "models/weapons/stiletto/v_knife_t.mdl",
+		world = "models/weapons/knife_stiletto/w_stiletto.mdl",
+		fov = 70,
+		hold = "knife",
+		draw = "draw",
+		idle = "lookat01",
+		attack = "heavy_miss1"
+	},
+	{
+		name = "M9 Bayonet Apophysis Fade",
+		view = "models/weapons/v_csgo_m9.mdl",
+		world = "models/weapons/w_csgo_m9.mdl",
+		material = "models/csgo_knife/knife_m9_bay_apophysis_fade",
+		fov = 65,
+		hold = "knife",
+		draw = "draw",
+		idle = "idle1",
+		attack = {"light_miss1", "light_miss2"}
+	}
+}
+
 SWEP.HoldType = "knife"
 SWEP.SequenceDraw = "draw"
 SWEP.SequenceIdle = "idle"
@@ -219,6 +296,7 @@ end
 
 function SWEP:ThrowKnife(force)
 	local ent = ents.Create("mu_knife")
+	ent:SetVariant(self:GetVariant())
 	ent:SetOwner(self.Owner)
 	ent:SetPos(self.Owner:GetShootPos())
 	local knife_ang = Angle(-28,0,0) + self.Owner:EyeAngles()

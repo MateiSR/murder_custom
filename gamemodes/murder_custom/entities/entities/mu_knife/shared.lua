@@ -10,6 +10,5 @@ ENT.Purpose			= ""
 ENT.Instructions	= ""
 
 function ENT:SetupDataTables()
-
-
+	self:NetworkVar("Int", 0, "Variant")
 end

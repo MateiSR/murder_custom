@@ -74,6 +74,8 @@ Shipped assets live under `gamemodes/murder_custom/content/`. Current material f
 
 Server registrations are explicit `resource.AddFile(...)` calls in `gamemode/init.lua`. When adding an asset that clients must download, put it under `content/`, reference the mounted runtime path in code, and add/verify its resource registration.
 
+Weapon cosmetic variants use external Workshop addons instead of copying their model and material files into this repository. `gamemode/init.lua` registers each item with `resource.AddWorkshop(...)`; the server must also mount the same items through its Workshop collection. The USP-S Orion and Minecraft Bow items replace existing mounted material/model paths globally, while the other variants use addon-specific paths. See [Development and release](development.md#runtime-workshop-dependencies) for the current IDs and deployment requirements.
+
 ## Data-change checks
 
 - Confirm the directory uses the exact map name.
