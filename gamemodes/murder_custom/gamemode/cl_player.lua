@@ -107,19 +107,3 @@ function EntityMeta:GetBystanderName()
 	end
 	return name
 end
-
-function GM:ApplyMurderDisguiseModel(ply)
-	local model = ply:GetNWString("murderDisguiseModel")
-	if model != "" then
-		ply.MurderDisguiseModelActive = true
-		if ply:GetModel() != model then
-			ply:SetModel(model)
-		end
-	elseif ply.MurderDisguiseModelActive then
-		local original = ply:GetNWString("murderDisguiseOriginalModel")
-		if original != "" then
-			ply:SetModel(original)
-		end
-		ply.MurderDisguiseModelActive = nil
-	end
-end

@@ -21,6 +21,7 @@ end)
 
 local PlayerMeta = FindMetaTable("Player")
 local EntityMeta = FindMetaTable("Entity")
+local SetModel = EntityMeta.SetModel // bypass player-model selector wrappers
 
 function GM:PlayerInitialSpawn( ply )
 	ply.LootCollected = 0
@@ -560,9 +561,7 @@ function PlayerMeta:MurdererDisguise(copyent)
 	if GAMEMODE.CanDisguise:GetBool() then
 		self.Disguised = true
 		self.DisguisedStart = CurTime()
-		self:SetNWString("murderDisguiseOriginalModel", self.DisguiseModel)
-		self:SetNWString("murderDisguiseModel", copyent:GetModel())
-		self:SetModel(copyent:GetModel())
+		SetModel(self, copyent:GetModel())
 		self:SetPlayerColor(copyent:GetPlayerColor())
 		self:SetupHands()
 	else
@@ -571,11 +570,10 @@ function PlayerMeta:MurdererDisguise(copyent)
 end
 
 function PlayerMeta:UnMurdererDisguise()
-	self:SetNWString("murderDisguiseModel", "")
 	if self.Disguised then
 		self:SetPlayerColor(self.DisguiseColor)
 		if self.DisguiseModel then
-			self:SetModel(self.DisguiseModel)
+			SetModel(self, self.DisguiseModel)
 			self:SetupHands()
 		end
 	end

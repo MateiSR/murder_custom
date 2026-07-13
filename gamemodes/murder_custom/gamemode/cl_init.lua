@@ -32,8 +32,6 @@ GM.FogEmitters = {}
 if GAMEMODE then GM.FogEmitters = GAMEMODE.FogEmitters end
 function GM:Think()
 	for k, ply in pairs(player.GetAll()) do
-		self:ApplyMurderDisguiseModel(ply)
-
 		if ply:Alive() && ply:GetNWBool("MurdererFog") then
 			if !ply.FogEmitter then
 				ply.FogEmitter = ParticleEmitter(ply:GetPos())
