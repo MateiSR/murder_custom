@@ -65,6 +65,7 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 | `GrabLoot`, `SetLoot` | `sv_loot.lua` | `cl_rounds.lua` | Local loot count |
 | `spectating_status` | `sv_spectate.lua` | `cl_spectate.lua` | Custom spectate state |
 | `mu_death` | `sv_player.lua` | `cl_respawn.lua` | Death overlay timing |
+| `mu_corpse_inspection` | `sv_player.lua` | `cl_hud.lua` | Targeted corpse entity, elapsed death time, cause enum, and dragged flag after a living bystander inspects with `+use` |
 | `mu_weapon_variant` | `sv_player.lua` | `cl_player.lua` | Validated live weapon-cosmetic selection |
 | `add_footstep`, `clear_footsteps` | `sv_footsteps.lua` | `cl_footsteps.lua` | Murderer footprint clues |
 | `chattext_msg`, `msg_clients` | `sv_chattext.lua` | `cl_chattext.lua` | Structured/system chat |
@@ -77,6 +78,8 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 | `mu_knife_charge` | `weapon_mu_knife.lua` | Same shared SWEP | Thrown-knife charge UI |
 | `TTT_ConfirmUseTButton` | `entities/entities/ttt_traitor_button/init.lua` | `shared.lua` client branch in the same entity | Successful map-button feedback |
 | `translator_language` | `sh_translate.lua` server branch | Same file, client branch | Selected gameplay language |
+
+`mu_corpse_inspection` writes the ragdoll entity, a float containing its current age in seconds, a two-bit cause (`0` unknown, `1` slashed, `2` shot), then the dragged boolean. The client advances the received age locally while the inspection remains visible.
 
 `weapon_mers_base.lua` also defines an integer `Variant` network variable for its SWEP instances. When a player equips a knife or magnum, the server validates and applies that player's archived user-info selection; clients then apply the matching view model, world model, skin, material, animations, and sounds. The thrown `mu_knife` entity carries its own integer `Variant` so throwing and recovering a knife preserves its appearance until it is equipped again.
 

@@ -79,6 +79,8 @@ function ENT:PhysicsCollide( data, physobj )
 		local dmg = DamageInfo()
 		dmg:SetDamage(120)
 		dmg:SetAttacker(self:GetOwner())
+		dmg:SetInflictor(self)
+		dmg:SetDamageType(DMG_SLASH)
 		ply:TakeDamageInfo(dmg)
 		self:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
 

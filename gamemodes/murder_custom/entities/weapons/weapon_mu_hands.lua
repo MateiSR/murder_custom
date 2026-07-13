@@ -50,6 +50,7 @@ local pickupWhiteList = {
 	prop_physics = true,
 	prop_physics_multiplayer = true
 }
+local dragEvidenceDistance = 32
 
 if SERVER then
 	function SWEP:CanPickup(ent)
@@ -82,6 +83,11 @@ function SWEP:ApplyForce()
 	local phys = self.CarryEnt:GetPhysicsObjectNum(self.CarryBone)
 	
 	if IsValid(phys) then
+		if SERVER && self.CarryEnt.CorpseDeathTime && self.CarryStartPos
+			&& self.CarryEnt:GetPos():Distance(self.CarryStartPos) >= dragEvidenceDistance then
+			self.CarryEnt.CorpseDragged = true
+		end
+
 		local vec = target - phys:GetPos()
 		local len = vec:Length()
 		if len > 40 then
@@ -108,9 +114,11 @@ function SWEP:SetCarrying(ent, bone)
 	if IsValid(ent) then
 		self.CarryEnt = ent
 		self.CarryBone = bone
+		self.CarryStartPos = ent:GetPos()
 	else
 		self.CarryEnt = nil
 		self.CarryBone = nil
+		self.CarryStartPos = nil
 	end
 	
 	if IsValid(self.Owner) then

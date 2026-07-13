@@ -50,6 +50,22 @@ surface.CreateFont( "MersDeathBig" , {
 
 GM.RoundStartUnfreezeTime = 10
 
+net.Receive("mu_corpse_inspection", function()
+	local ent = net.ReadEntity()
+	local age = net.ReadFloat()
+	local cause = net.ReadUInt(2)
+	local dragged = net.ReadBool()
+	if !IsValid(ent) then return end
+
+	GAMEMODE.CorpseInspection = {
+		Entity = ent,
+		Age = age,
+		Cause = cause,
+		Dragged = dragged,
+		Received = CurTime()
+	}
+end)
+
 local function drawTextShadow(t,f,x,y,c,px,py)
 	color_black.a = c.a
 	draw.SimpleText(t,f,x + 1,y + 1,color_black,px,py)
@@ -172,6 +188,33 @@ local function colorDif(col1, col2)
 	return x + y + z
 end
 
+local function corpseTimeText(age)
+	local elapsed = math.max(0, math.floor(age))
+	local seconds = elapsed % 60
+	local secondUnit = seconds == 1 and translate.corpseSecond or translate.corpseSeconds
+	if elapsed < 60 then
+		return Translator:VarTranslate(translate.corpseTimeSeconds, {
+			seconds = tostring(seconds),
+			unit = secondUnit
+		})
+	end
+
+	local minutes = math.floor(elapsed / 60)
+	local minuteUnit = minutes == 1 and translate.corpseMinute or translate.corpseMinutes
+	return Translator:VarTranslate(translate.corpseTimeMinutes, {
+		minutes = tostring(minutes),
+		minuteUnit = minuteUnit,
+		seconds = tostring(seconds),
+		secondUnit = secondUnit
+	})
+end
+
+local function corpseCauseText(cause)
+	if cause == 1 then return translate.corpseCauseSlashed end
+	if cause == 2 then return translate.corpseCauseShot end
+	return translate.corpseCauseUnknown
+end
+
 function GM:DrawGameHUD(ply)
 	if !IsValid(ply) then return end
 	local health = ply:Health()
@@ -252,12 +295,46 @@ function GM:DrawGameHUD(ply)
 			self.LastLooked = tr.Entity
 			self.LookedFade = CurTime()
 		end
+
+		local inspection = self.CorpseInspection
+		if inspection && (!IsValid(inspection.Entity) || self.LastLooked != inspection.Entity || (self.LookedFade or 0) + 2 <= CurTime()) then
+			self.CorpseInspection = nil
+			inspection = nil
+		end
+
 		if IsValid(self.LastLooked) && self.LookedFade + 2 > CurTime() then
 			local name = self.LastLooked:GetBystanderName() or "error"
 			local col = self.LastLooked:GetPlayerColor() or Vector()
 			col = Color(col.x * 255, col.y * 255, col.z * 255)
 			col.a = (1 - (CurTime() - self.LookedFade) / 2) * 255
-			drawTextShadow(name, "MersRadial", ScrW() / 2, ScrH() / 2 + 80, col, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+			if inspection && inspection.Entity == self.LastLooked then
+				local y = ScrH() / 2 + 80
+				drawTextShadow(translate.corpseVictim .. name, "MersRadial", ScrW() / 2, y, col, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+				local h = draw.GetFontHeight("MersRadialSmall")
+				local detailCol = Color(255, 255, 255, col.a)
+				y = y + draw.GetFontHeight("MersRadial") * 0.7
+				drawTextShadow(corpseTimeText(inspection.Age + CurTime() - inspection.Received), "MersRadialSmall", ScrW() / 2, y, detailCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				y = y + h
+				drawTextShadow(translate.corpseCause .. corpseCauseText(inspection.Cause), "MersRadialSmall", ScrW() / 2, y, detailCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+				if inspection.Dragged then
+					y = y + h
+					drawTextShadow(translate.corpseDragged, "MersRadialSmall", ScrW() / 2, y, Color(255, 190, 60, col.a), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				end
+			else
+				drawTextShadow(name, "MersRadial", ScrW() / 2, ScrH() / 2 + 80, col, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+		end
+
+		if !self:GetAmMurderer() && IsValid(tr.Entity) && tr.Entity:GetClass() == "prop_ragdoll"
+			&& tr.HitPos:Distance(tr.StartPos) < 80 && tr.Entity:GetNWString("bystanderName") != ""
+			&& (!inspection || inspection.Entity != tr.Entity) then
+			local key = input.LookupBinding("use") or "E"
+			local text = Translator:VarTranslate(translate.inspectCorpse, {key = key:upper()})
+			local y = ScrH() / 2 + 80 + draw.GetFontHeight("MersRadial") * 0.7
+			drawTextShadow(text, "MersRadialSmall", ScrW() / 2, y, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 	end
 

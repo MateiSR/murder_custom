@@ -14,6 +14,7 @@ Use this guide to find the owner of a behavior. Read the start file, its paired 
 | Spectating | `gamemode/sv_spectate.lua` | `cl_spectate.lua` | Custom target/mode selection and client display |
 | Respawning | `gamemode/sv_respawn.lua` | `cl_respawn.lua` | Eligibility and death/respawn overlays |
 | Ragdolls | `gamemode/sv_ragdoll.lua` | `cl_ragdoll.lua` | Death ragdoll creation and cleanup |
+| Corpse inspection | `gamemode/sv_player.lua` | `cl_hud.lua` | Living bystanders press `+use` on a nearby death ragdoll to see victim, elapsed death time, cause, and drag evidence |
 
 Round flow starts in `GM:StartNewRound()` in `sv_rounds.lua`. It cleans the map, resets players, selects a murderer through `WeightedRandom`, gives a random bystander the magnum, and networks the new state. Player death handling routes from `sv_player.lua` back into round win checks.
 
@@ -46,10 +47,10 @@ The data locations and precedence rules are documented in [Data and localization
 | Path | Responsibility |
 | --- | --- |
 | `entities/weapons/weapon_mers_base.lua` | Shared scripted-weapon behavior and networked cosmetic-variant application used by Murder weapons |
-| `entities/weapons/weapon_mu_hands.lua` | Unarmed prop carrying; ragdoll `+use` pickup is disabled and only the living murderer can drag one with secondary attack |
+| `entities/weapons/weapon_mu_hands.lua` | Unarmed prop carrying; ragdoll `+use` pickup is disabled, only the living murderer can drag one with secondary attack, and moving a corpse at least 32 units records drag evidence |
 | `entities/weapons/weapon_mu_knife.lua` | Murderer melee attack, charged throw, and expandable knife variant catalog |
 | `entities/weapons/weapon_mu_magnum.lua` | Bystander one-shot weapon behavior and expandable visual/sound variant catalog |
-| `entities/entities/mu_knife/` | Thrown knife world entity; preserves the originating knife variant through recovery |
+| `entities/entities/mu_knife/` | Thrown knife world entity; preserves the originating knife variant through recovery and tags player hits as slash damage |
 | `entities/entities/mu_loot/` | Collectible loot world entity |
 | `entities/entities/ttt_traitor_button/` | Compatibility with map-authored TTT traitor buttons |
 

@@ -1,5 +1,6 @@
 util.AddNetworkString("mu_death")
 util.AddNetworkString("mu_weapon_variant")
+util.AddNetworkString("mu_corpse_inspection")
 
 local variantWeapons = {
 	[0] = "weapon_mu_knife",
@@ -22,6 +23,16 @@ end)
 local PlayerMeta = FindMetaTable("Player")
 local EntityMeta = FindMetaTable("Entity")
 local SetModel = EntityMeta.SetModel // bypass player-model selector wrappers
+
+local CORPSE_CAUSE_UNKNOWN = 0
+local CORPSE_CAUSE_SLASHED = 1
+local CORPSE_CAUSE_SHOT = 2
+
+local function getCorpseCause(dmginfo)
+	if dmginfo:IsDamageType(DMG_SLASH) then return CORPSE_CAUSE_SLASHED end
+	if dmginfo:IsDamageType(DMG_BULLET) then return CORPSE_CAUSE_SHOT end
+	return CORPSE_CAUSE_UNKNOWN
+end
 
 function GM:PlayerInitialSpawn( ply )
 	ply.LootCollected = 0
@@ -146,6 +157,9 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 
 	local ent = ply:GetNWEntity("DeathRagdoll")
 	if IsValid(ent) then
+		ent.CorpseDeathTime = CurTime()
+		ent.CorpseDeathCause = getCorpseCause(dmginfo)
+		ent.CorpseDragged = false
 		ply:CSpectate(OBS_MODE_CHASE, ent)
 		ent:SetBystanderName(ply:GetBystanderName())
 	end
@@ -533,6 +547,14 @@ local function pressedUse(self, ply)
 				ply:MurdererDisguise(tr.Entity)
 				return
 			end
+		elseif ply:Alive() && ply:Team() == 2 && tr.Entity.CorpseDeathTime then
+			net.Start("mu_corpse_inspection")
+			net.WriteEntity(tr.Entity)
+			net.WriteFloat(math.max(0, CurTime() - tr.Entity.CorpseDeathTime))
+			net.WriteUInt(tr.Entity.CorpseDeathCause or CORPSE_CAUSE_UNKNOWN, 2)
+			net.WriteBool(tr.Entity.CorpseDragged)
+			net.Send(ply)
+			return
 		end
 	end
 	
