@@ -60,7 +60,7 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 
 | Message | Server side | Client side | Purpose |
 | --- | --- | --- | --- |
-| `SetRound`, `DeclareWinner` | `sv_rounds.lua` | `cl_rounds.lua`, `cl_endroundboard.lua` | Round state and result |
+| `SetRound`, `DeclareWinner` | `sv_rounds.lua` | `cl_rounds.lua`, `cl_endroundboard.lua` | Round state, result, and up to three server-selected highlight records |
 | `your_are_a_murderer` | `sv_murderer.lua` | `cl_murderer.lua` | Local role state |
 | `GrabLoot`, `SetLoot` | `sv_loot.lua` | `cl_rounds.lua` | Local loot count |
 | `spectating_status` | `sv_spectate.lua` | `cl_spectate.lua` | Custom spectate state |

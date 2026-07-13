@@ -32,7 +32,7 @@ The data locations and precedence rules are documented in [Data and localization
 | --- | --- | --- |
 | Main HUD and round-start overlay | `gamemode/cl_hud.lua` | `cl_rounds.lua`, `cl_respawn.lua`, `cl_flashlight.lua` |
 | Scoreboard | `gamemode/cl_scoreboard.lua` | `sv_adminpanel.lua`, `cl_adminpanel.lua` |
-| End-round board | `gamemode/cl_endroundboard.lua` | `sv_rounds.lua`, `init.lua` |
+| End-round board | `gamemode/cl_endroundboard.lua` | `sv_rounds.lua`, `sv_player.lua`, `cl_rounds.lua`, `init.lua`; renders up to three server-selected round highlights |
 | Structured chat | `gamemode/sv_chattext.lua`, `cl_chattext.lua` | Callers constructing `ChatText` messages |
 | Voice panels | `gamemode/cl_voicepanels.lua` | Voice visibility rules in `sv_player.lua` |
 | Radial Q menu | `gamemode/cl_qmenu.lua` | Taunts in `sv_taunt.lua` |

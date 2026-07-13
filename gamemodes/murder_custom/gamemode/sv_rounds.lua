@@ -9,6 +9,32 @@ if GAMEMODE then
 	GM.RoundCount = GAMEMODE.RoundCount
 end
 
+local function playerAward(id, ply, value)
+	if !IsValid(ply) then return end
+	return {
+		id = id,
+		player = ply,
+		playerName = ply:Nick(),
+		playerColor = ply:GetPlayerColor(),
+		value = value or 0
+	}
+end
+
+local function uniqueLeader(players, field)
+	local leader
+	local highest = 0
+	for k, ply in pairs(players) do
+		local value = ply[field] or 0
+		if value > highest then
+			leader = ply
+			highest = value
+		elseif value == highest then
+			leader = nil
+		end
+	end
+	return leader, highest
+end
+
 function GM:GetRound()
 	return self.RoundStage or 0
 end
@@ -148,6 +174,9 @@ end
 function GM:DoRoundDeaths(dead, attacker)
 	if self.RoundStage == self.Round.Playing then
 		self.RoundLastDeath = CurTime() + 2
+		if !self.RoundFirstDeath then
+			self.RoundFirstDeath = playerAward("coldOpen", dead, math.max(0, math.floor(CurTime() - self.RoundTime)))
+		end
 	end
 end
 
@@ -158,6 +187,39 @@ function GM:EndTheRound(reason, murderer)
 	if self.RoundStage != self.Round.Playing then return end
 
 	local players = team.GetPlayers(2)
+	local awards = {}
+	local function addAward(award)
+		if award && #awards < 3 then
+			table.insert(awards, award)
+		end
+	end
+
+	if reason == 2 && IsValid(self.RoundMurdererKiller) then
+		addAward(playerAward(self.RoundMurdererKillerWasLast and "clutchShot" or "caseClosed", self.RoundMurdererKiller))
+	elseif reason == 1 && IsValid(murderer) && (murderer.RoundMurdererKills or 0) > 0 then
+		addAward(playerAward("perfectCrime", murderer, murderer.RoundMurdererKills))
+	end
+
+	if #players >= 3 then
+		addAward(self.RoundFirstDeath)
+	end
+
+	local leader, count = uniqueLeader(players, "RoundTeamKills")
+	addAward(playerAward("oshaViolation", leader, count))
+
+	leader, count = uniqueLeader(players, "LootCollected")
+	addAward(playerAward("lootGoblin", leader, count))
+
+	local roundTime = math.max(0, math.floor(CurTime() - self.RoundTime))
+	if roundTime < 60 && #awards < 3 then
+		table.insert(awards, {
+			id = "speedrun",
+			playerName = "",
+			playerColor = Vector(1, 1, 1),
+			value = roundTime
+		})
+	end
+
 	for k, ply in pairs(players) do
 		ply:SetTKer(false)
 		ply:SetMurdererRevealed(false)
@@ -209,13 +271,14 @@ function GM:EndTheRound(reason, murderer)
 		net.WriteString("?")
 	end
 
-	for k, ply in pairs(team.GetPlayers(2)) do
-		net.WriteUInt(1, 8)
-		net.WriteEntity(ply)
-		net.WriteUInt(ply.LootCollected, 32)
-		net.WriteVector(ply:GetPlayerColor())
+	net.WriteUInt(#awards, 2)
+	for k, award in ipairs(awards) do
+		net.WriteString(award.id)
+		net.WriteEntity(IsValid(award.player) and award.player or Entity(0))
+		net.WriteString(award.playerName)
+		net.WriteVector(award.playerColor)
+		net.WriteUInt(math.Clamp(award.value, 0, 65535), 16)
 	end
-	net.WriteUInt(0, 8)
 
 	net.Broadcast()
 
@@ -273,6 +336,9 @@ function GM:StartNewRound()
 
 	local roundStartUnfreezeTime = self.RoundStartUnfreezeTime:GetFloat()
 	self.RoundUnFreezePlayers = CurTime() + roundStartUnfreezeTime
+	self.RoundFirstDeath = nil
+	self.RoundMurdererKiller = nil
+	self.RoundMurdererKillerWasLast = false
 
 	local players = team.GetPlayers(2)
 	for k,ply in pairs(players) do
@@ -328,6 +394,8 @@ function GM:StartNewRound()
 		ply:SetPlayerColor(vec)
 
 		ply.LootCollected = 0
+		ply.RoundMurdererKills = 0
+		ply.RoundTeamKills = 0
 		ply.HasMoved = false
 		ply.Frozen = true
 		ply:SetTKer(false)

@@ -49,22 +49,17 @@ net.Receive("DeclareWinner" , function (length)
 	data.murderer = net.ReadEntity()
 	data.murdererColor = net.ReadVector()
 	data.murdererName = net.ReadString()
-	if IsValid(data.murderer) then
-	end
 
-	data.collectedLoot = {}
-	while true do
-		local cont = net.ReadUInt(8)
-		if cont == 0 then break end
-
+	data.awards = {}
+	local awardCount = net.ReadUInt(2)
+	for i = 1, awardCount do
 		local t = {}
+		t.id = net.ReadString()
 		t.player = net.ReadEntity()
-		if IsValid(t.player) then
-			t.playerName = t.player:Nick()
-		end
-		t.count = net.ReadUInt(32)
+		t.playerName = net.ReadString()
 		t.playerColor = net.ReadVector()
-		table.insert(data.collectedLoot, t)
+		t.value = net.ReadUInt(16)
+		table.insert(data.awards, t)
 	end
 
 	GAMEMODE:DisplayEndRoundBoard(data)

@@ -1,5 +1,15 @@
 
 local menu
+local awardText = {
+	caseClosed = {"endroundAwardCaseClosed", "endroundAwardCaseClosedDetail"},
+	clutchShot = {"endroundAwardClutchShot", "endroundAwardClutchShotDetail"},
+	perfectCrime = {"endroundAwardPerfectCrime", "endroundAwardPerfectCrimeDetail"},
+	coldOpen = {"endroundAwardColdOpen", "endroundAwardColdOpenDetail"},
+	lootGoblin = {"endroundAwardLootGoblin", "endroundAwardLootGoblinDetail"},
+	oshaViolation = {"endroundAwardOshaViolation", "endroundAwardOshaViolationDetail"},
+	speedrun = {"endroundAwardSpeedrun", "endroundAwardSpeedrunDetail"}
+}
+
 function GM:DisplayEndRoundBoard(data)
 	if IsValid(menu) then
 		menu:Remove()
@@ -68,68 +78,89 @@ function GM:DisplayEndRoundBoard(data)
 		end
 	end
 
-	local lootPnl = vgui.Create("DPanel", menu)
-	lootPnl:Dock(FILL)
-	lootPnl:DockPadding(24,24,24,24)
-	function lootPnl:Paint(w, h) 
+	local highlightsPnl = vgui.Create("DPanel", menu)
+	highlightsPnl:Dock(FILL)
+	highlightsPnl:DockPadding(24,24,24,24)
+	function highlightsPnl:Paint(w, h)
 		surface.SetDrawColor(Color(50,50,50,255))
 		surface.DrawRect(2, 2, w - 4, h - 4)
 	end
 
-	local desc = vgui.Create("DLabel", lootPnl)
+	local desc = vgui.Create("DLabel", highlightsPnl)
 	desc:Dock(TOP)
 	desc:SetFont("MersRadial")
 	desc:SetAutoStretchVertical(true)
-	desc:SetText(translate.endroundLootCollected)
+	desc:SetText(translate.endroundHighlights)
 	desc:SetTextColor(color_white)
-	
-	local lootList = vgui.Create("DPanelList", lootPnl)
-	lootList:Dock(FILL)
 
-	table.sort(data.collectedLoot, function (a, b)
-		return a.count > b.count
-	end)
+	local awardList = vgui.Create("DPanelList", highlightsPnl)
+	awardList:Dock(FILL)
+	awardList:SetSpacing(4)
 
-	for k, v in pairs(data.collectedLoot) do
-		if !v.playerName then continue end
+	if #data.awards == 0 then
+		local empty = vgui.Create("DLabel", awardList)
+		empty:SetTall(draw.GetFontHeight("MersRadialSmall") + 24)
+		empty:SetFont("MersRadialSmall")
+		empty:SetText(translate.endroundNoHighlights)
+		empty:SetTextColor(Color(180, 180, 180))
+		empty:SetContentAlignment(5)
+		awardList:AddItem(empty)
+	end
+
+	for k, v in ipairs(data.awards) do
+		local text = awardText[v.id]
+		if !text then continue end
+
 		local pnl = vgui.Create("DPanel")
-		pnl:SetTall(draw.GetFontHeight("MersRadialSmall"))
+		pnl:SetTall(draw.GetFontHeight("MersRadial") + draw.GetFontHeight("MersRadialSmall") + 24)
 		function pnl:Paint(w, h)
+			surface.SetDrawColor(Color(44, 44, 44, 255))
+			surface.DrawRect(0, 2, w, h - 4)
 		end
 		function pnl:PerformLayout()
 			if self.NamePnl then
-				self.NamePnl:SetWidth(self:GetWide() * 0.8)
-			end
-			self:SizeToChildren(false, true)
-		end
-
-		local name = vgui.Create("DButton", pnl)
-		pnl.NamePnl = name
-		name:Dock(LEFT)
-		name:SetAutoStretchVertical(true)
-		name:SetText(v.playerName)
-		name:SetFont("MersRadialSmall")
-		local col = v.playerColor
-		name:SetTextColor(Color(col.x * 255, col.y * 255, col.z * 255))
-		name:SetContentAlignment(4)
-		function name:Paint() end
-		function name:DoClick()
-			if IsValid(v.player) then
-				GAMEMODE:DoScoreboardActionPopup(v.player)
+				self.NamePnl:SetWidth(self:GetWide() * 0.6)
 			end
 		end
 
-		local count = vgui.Create("DLabel", pnl)
-		pnl.CountPnl = count
-		count:Dock(FILL)
-		count:SetAutoStretchVertical(true)
-		count:SetText(tostring(v.count))
-		count:SetFont("MersRadialSmall")
-		local col = v.playerColor
-		count:SetTextColor(Color(col.x * 255, col.y * 255, col.z * 255))
-		count.DoClick = count.DoClick
+		local title = vgui.Create("DLabel", pnl)
+		title:Dock(TOP)
+		title:DockMargin(12, 6, 12, 0)
+		title:SetFont("MersRadial")
+		title:SetText(translate[text[1]])
+		title:SetTextColor(v.id == "oshaViolation" and Color(220, 80, 80) or Color(255, 190, 70))
+		title:SetAutoStretchVertical(true)
 
-		lootList:AddItem(pnl)
+		if v.playerName != "" then
+			local name = vgui.Create("DButton", pnl)
+			pnl.NamePnl = name
+			name:Dock(LEFT)
+			name:DockMargin(12, 0, 0, 6)
+			name:SetText(v.playerName)
+			name:SetFont("MersRadialSmall")
+			local col = v.playerColor
+			name:SetTextColor(Color(col.x * 255, col.y * 255, col.z * 255))
+			name:SetContentAlignment(4)
+			function name:Paint() end
+			function name:DoClick()
+				if IsValid(v.player) then
+					GAMEMODE:DoScoreboardActionPopup(v.player)
+				end
+			end
+		end
+
+		local detail = vgui.Create("DLabel", pnl)
+		detail:Dock(FILL)
+		detail:DockMargin(12, 0, 12, 6)
+		detail:SetFont("MersRadialSmall")
+		detail:SetText(Translator:VarTranslate(translate[text[2]], {
+			count = tostring(v.value),
+			seconds = tostring(v.value)
+		}))
+		detail:SetTextColor(Color(210, 210, 210))
+		detail:SetContentAlignment(6)
+
+		awardList:AddItem(pnl)
 	end
 
 	local add = vgui.Create("DButton", menu)

@@ -251,10 +251,12 @@ function GM:PlayerDeath(ply, Inflictor, attacker )
 
 		if IsValid(attacker) && attacker:IsPlayer() then
 			if attacker:GetMurderer() then
+				attacker.RoundMurdererKills = (attacker.RoundMurdererKills or 0) + 1
 				if self.RemoveDisguiseOnKill:GetBool() then
 					attacker:UnMurdererDisguise()
 				end
 			elseif attacker != ply then
+				attacker.RoundTeamKills = (attacker.RoundTeamKills or 0) + 1
 				if self.ShowBystanderTKs:GetBool() then
 					local col = attacker:GetPlayerColor()
 					local msgs = Translator:AdvVarTranslate(translate.killedTeamKill, {
@@ -269,6 +271,15 @@ function GM:PlayerDeath(ply, Inflictor, attacker )
 		end
 	else
 		if attacker != ply && IsValid(attacker) && attacker:IsPlayer() then
+			self.RoundMurdererKiller = attacker
+			local aliveBystanders = 0
+			for k, other in pairs(team.GetPlayers(2)) do
+				if other:Alive() && !other:GetMurderer() then
+					aliveBystanders = aliveBystanders + 1
+				end
+			end
+			self.RoundMurdererKillerWasLast = aliveBystanders == 1
+
 			local col = attacker:GetPlayerColor()
 			local msgs = Translator:AdvVarTranslate(translate.killedMurderer, {
 				player = {text = attacker:Nick(), color = Color(col.x * 255, col.y * 255, col.z * 255)}
