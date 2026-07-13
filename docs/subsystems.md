@@ -46,7 +46,7 @@ The data locations and precedence rules are documented in [Data and localization
 | Path | Responsibility |
 | --- | --- |
 | `entities/weapons/weapon_mers_base.lua` | Shared scripted-weapon behavior and networked cosmetic-variant application used by Murder weapons |
-| `entities/weapons/weapon_mu_hands.lua` | Unarmed player weapon |
+| `entities/weapons/weapon_mu_hands.lua` | Unarmed prop carrying; ragdoll `+use` pickup is disabled and only the living murderer can drag one with secondary attack |
 | `entities/weapons/weapon_mu_knife.lua` | Murderer melee attack, charged throw, and expandable knife variant catalog |
 | `entities/weapons/weapon_mu_magnum.lua` | Bystander one-shot weapon behavior and expandable visual/sound variant catalog |
 | `entities/entities/mu_knife/` | Thrown knife world entity; preserves the originating knife variant through recovery |

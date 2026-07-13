@@ -131,6 +131,7 @@ function GM:Think()
 end
 
 function GM:AllowPlayerPickup( ply, ent )
+	if ent:GetClass() == "prop_ragdoll" then return false end
 	return true
 end
 

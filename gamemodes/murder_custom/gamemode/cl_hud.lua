@@ -265,9 +265,18 @@ function GM:DrawGameHUD(ply)
 	if shouldDraw != false then
 		if self:GetAmMurderer() then
 			if IsValid(tr.Entity) && tr.Entity:GetClass() == "prop_ragdoll" && tr.HitPos:Distance(tr.StartPos) < 80 then
+				local h = draw.GetFontHeight("MersRadial")
+				local y = ScrH() / 2 + 80 + h * 0.7
 				if tr.Entity:GetModel() != ply:GetModel() || colorDif(tr.Entity:GetPlayerColor(), ply:GetPlayerColor()) > 0.1 then
-					local h = draw.GetFontHeight("MersRadial")
-					drawTextShadow(translate.pressEToDisguise, "MersRadialSmall", ScrW() / 2, ScrH() / 2 + 80 + h * 0.7, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					drawTextShadow(translate.pressEToDisguise, "MersRadialSmall", ScrW() / 2, y, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					y = y + h * 0.7
+				end
+
+				local weapon = ply:GetActiveWeapon()
+				if IsValid(weapon) && weapon:GetClass() == "weapon_mu_hands" then
+					local key = input.LookupBinding("attack2") or "MOUSE2"
+					local text = Translator:VarTranslate(translate.holdKeyToDragBody, {key = key:upper()})
+					drawTextShadow(text, "MersRadialSmall", ScrW() / 2, y, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				end
 			end
 		end

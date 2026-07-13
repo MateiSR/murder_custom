@@ -56,6 +56,9 @@ if SERVER then
 		if ent:IsWeapon() || ent:IsPlayer() || ent:IsNPC() then return false end
 		
 		local class = ent:GetClass()
+		if class == "prop_ragdoll" then
+			return self.Owner:Alive() && self.Owner:GetMurderer()
+		end
 		if pickupWhiteList[class] then return true end
 
 		return false
@@ -110,18 +113,28 @@ function SWEP:SetCarrying(ent, bone)
 		self.CarryBone = nil
 	end
 	
-	self.Owner:CalculateSpeed()
+	if IsValid(self.Owner) then
+		self.Owner:CalculateSpeed()
+	end
 end
 
 function SWEP:Think()
 	self.BaseClass.Think(self)
-	if IsValid(self.Owner) && self.Owner:KeyDown(IN_ATTACK2) then
-		if IsValid(self.CarryEnt) then
-			self:ApplyForce()
-		end
+	if IsValid(self.Owner) && self.Owner:Alive() && self.Owner:KeyDown(IN_ATTACK2) && IsValid(self.CarryEnt) && self:CanPickup(self.CarryEnt) then
+		self:ApplyForce()
 	elseif self.CarryEnt then
 		self:SetCarrying()
 	end
+end
+
+function SWEP:Holster(newWep)
+	if SERVER then self:SetCarrying() end
+	return self.BaseClass.Holster(self, newWep)
+end
+
+function SWEP:OnRemove()
+	if SERVER then self:SetCarrying() end
+	self.BaseClass.OnRemove(self)
 end
 
 function SWEP:PrimaryAttack()

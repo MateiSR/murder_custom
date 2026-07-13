@@ -127,6 +127,7 @@ pt.murdererFog = "Your evil presence is showing"
 pt.murdererFogSub = "Kill someone to hide"
 
 pt.pressEToDisguise = "[E] Disguise"
+pt.holdKeyToDragBody = "Hold [{key}] to drag body"
 
 pt.playerStatusDead = "Dead"
 
