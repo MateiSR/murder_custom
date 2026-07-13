@@ -82,7 +82,7 @@ function SWEP:ApplyVariant(index)
 	self:SetMaterial(variant.material or "")
 
 	local owner = self:GetOwner()
-	if IsValid(owner) then
+	if IsValid(owner) && owner:GetActiveWeapon() == self then
 		local vm = owner:GetViewModel()
 		if IsValid(vm) then
 			vm:SetWeaponModel(variant.view, self)
