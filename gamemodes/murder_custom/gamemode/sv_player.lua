@@ -543,7 +543,7 @@ local function pressedUse(self, ply)
 	-- disguise as ragdolls
 	if IsValid(tr.Entity) && tr.Entity:GetClass() == "prop_ragdoll" && tr.HitPos:Distance(tr.StartPos) < 80 then
 		if ply:GetMurderer() then
-			if tr.Entity:GetModel() != ply:GetModel() || tr.Entity:GetPlayerColor() != ply:GetPlayerColor() then
+			if tr.Entity:GetModel() != ply:GetModel() || tr.Entity:GetPlayerColor() != ply:GetPlayerColor() || tr.Entity:GetBystanderName() != ply:GetBystanderName() then
 				ply:MurdererDisguise(tr.Entity)
 				return
 			end
@@ -590,12 +590,14 @@ function PlayerMeta:MurdererDisguise(copyent)
 	if !self.Disguised then
 		self.DisguiseColor = self:GetPlayerColor()
 		self.DisguiseModel = self:GetModel()
+		self.DisguiseName = self:GetBystanderName()
 	end
 	if GAMEMODE.CanDisguise:GetBool() then
 		self.Disguised = true
 		self.DisguisedStart = CurTime()
 		SetModel(self, copyent:GetModel())
 		self:SetPlayerColor(copyent:GetPlayerColor())
+		self:SetBystanderName(copyent:GetBystanderName())
 		self:SetupHands()
 	else
 		self:UnMurdererDisguise()
@@ -605,6 +607,7 @@ end
 function PlayerMeta:UnMurdererDisguise()
 	if self.Disguised then
 		self:SetPlayerColor(self.DisguiseColor)
+		self:SetBystanderName(self.DisguiseName)
 		if self.DisguiseModel then
 			SetModel(self, self.DisguiseModel)
 			self:SetupHands()

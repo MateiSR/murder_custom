@@ -7,9 +7,9 @@ Use this guide to find the owner of a behavior. Read the start file, its paired 
 | Area | Server owner | Client/shared counterpart | Notes |
 | --- | --- | --- | --- |
 | Round lifecycle and map rotation | `gamemode/sv_rounds.lua` | `cl_rounds.lua`, `cl_endroundboard.lua`, `weightedrandom.lua` | State transitions, win checks, murderer selection, round limit, map list |
-| Murderer state and reveal | `gamemode/sv_murderer.lua` | `cl_murderer.lua` | Role flag, weighted chance reset, fog reveal, lost-knife recovery |
+| Murderer state and reveal | `gamemode/sv_murderer.lua`, disguise methods in `sv_player.lua` | `cl_murderer.lua`, `cl_hud.lua` | Role flag, weighted chance reset, fog reveal, lost-knife recovery, and corpse model/color/name disguise |
 | Player lifecycle | `gamemode/sv_player.lua` | `cl_player.lua` | Join/spawn, teams, models, loadout, weapon-cosmetic picker, death, pickup, chat/voice visibility |
-| Bystander identity | `gamemode/sv_bystandername.lua` | Player state consumed by HUD/scoreboard | Generated names and admin player listing |
+| Bystander identity | `gamemode/sv_bystandername.lua` | Player state consumed by HUD, chat, and voice panels | Generated names, disguise identity, and admin player listing; `mu_show_player_names` controls aim-target labels |
 | Team-kill penalty | `gamemode/sv_tker.lua` plus `sv_player.lua` | `cl_init.lua` | Penalty state and weapon restrictions |
 | Spectating | `gamemode/sv_spectate.lua` | `cl_spectate.lua` | Custom target/mode selection and client display |
 | Respawning | `gamemode/sv_respawn.lua` | `cl_respawn.lua` | Eligibility and death/respawn overlays |

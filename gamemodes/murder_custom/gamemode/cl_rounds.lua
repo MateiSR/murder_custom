@@ -26,6 +26,7 @@ net.Receive("SetRound", function (length)
 		GAMEMODE.RoundSettings.ShowAdminsOnScoreboard = net.ReadUInt(8) != 0
 		GAMEMODE.RoundSettings.AdminPanelAllowed = net.ReadUInt(8) != 0
 		GAMEMODE.RoundSettings.ShowSpectateInfo = net.ReadUInt(8) != 0
+		GAMEMODE.RoundSettings.ShowPlayerNames = net.ReadUInt(8) != 0
 	end
 
 	if r == GAMEMODE.Round.RoundStarting then

@@ -169,5 +169,13 @@
 			"type"		"Numeric"
 			"default"	"0"
 		}
+
+		21
+		{
+			"name"		"mu_show_player_names"
+			"text"		"show_player_names"
+			"type"		"CheckBox"
+			"default"	"1"
+		}
 	}
 }

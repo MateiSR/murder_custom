@@ -328,7 +328,7 @@ function GM:DrawGameHUD(ply)
 					y = y + h
 					drawTextShadow(translate.corpseDragged, "MersRadialSmall", ScrW() / 2, y, Color(255, 190, 60, col.a), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				end
-			else
+			elseif self.RoundSettings.ShowPlayerNames != false then
 				drawTextShadow(name, "MersRadial", ScrW() / 2, ScrH() / 2 + 80, col, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 		end
@@ -349,7 +349,7 @@ function GM:DrawGameHUD(ply)
 			if IsValid(tr.Entity) && tr.Entity:GetClass() == "prop_ragdoll" && tr.HitPos:Distance(tr.StartPos) < 80 then
 				local h = draw.GetFontHeight("MersRadial")
 				local y = ScrH() / 2 + 80 + h * 0.7
-				if tr.Entity:GetModel() != ply:GetModel() || colorDif(tr.Entity:GetPlayerColor(), ply:GetPlayerColor()) > 0.1 then
+				if tr.Entity:GetModel() != ply:GetModel() || colorDif(tr.Entity:GetPlayerColor(), ply:GetPlayerColor()) > 0.1 || tr.Entity:GetBystanderName() != ply:GetBystanderName() then
 					drawTextShadow(translate.pressEToDisguise, "MersRadialSmall", ScrW() / 2, y, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 					y = y + h * 0.7
 				end

@@ -79,7 +79,7 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 | `TTT_ConfirmUseTButton` | `entities/entities/ttt_traitor_button/init.lua` | `shared.lua` client branch in the same entity | Successful map-button feedback |
 | `translator_language` | `sh_translate.lua` server branch | Same file, client branch | Selected gameplay language |
 
-`SetRound` writes the eight-bit state, state-start timestamp, optional round deadline (`0` when disabled), settings block, optional pre-round start timestamp, then unfreeze duration.
+`SetRound` writes the eight-bit state, state-start timestamp, optional round deadline (`0` when disabled), settings block (including `mu_show_player_names`), optional pre-round start timestamp, then unfreeze duration.
 
 `mu_corpse_inspection` writes the ragdoll entity, a float containing its current age in seconds, a two-bit cause (`0` unknown, `1` slashed, `2` shot), then the dragged boolean. The client advances the received age locally while the inspection remains visible.
 

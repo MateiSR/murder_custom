@@ -49,6 +49,7 @@ function GM:SetRound(round)
 	self.RoundSettings.ShowAdminsOnScoreboard = self.ShowAdminsOnScoreboard:GetBool()
 	self.RoundSettings.AdminPanelAllowed = self.AdminPanelAllowed:GetBool()
 	self.RoundSettings.ShowSpectateInfo = self.ShowSpectateInfo:GetBool()
+	self.RoundSettings.ShowPlayerNames = self.ShowPlayerNames:GetBool()
 
 	self:NetworkRound()
 end
@@ -64,6 +65,7 @@ function GM:NetworkRound(ply)
 		net.WriteUInt(self.RoundSettings.ShowAdminsOnScoreboard and 1 or 0, 8)
 		net.WriteUInt(self.RoundSettings.AdminPanelAllowed and 1 or 0, 8)
 		net.WriteUInt(self.RoundSettings.ShowSpectateInfo and 1 or 0, 8)
+		net.WriteUInt(self.RoundSettings.ShowPlayerNames and 1 or 0, 8)
 	else
 		net.WriteUInt(0, 8)
 	end
