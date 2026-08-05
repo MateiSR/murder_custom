@@ -6,6 +6,8 @@ Bundled map data lives under `data_static/murder/<map>/`, where `<map>` is the e
 
 Runtime admin commands write to Garry's Mod's writable `DATA` mount. They do not update `data_static/` in this repository. Shipping an in-game edit therefore requires deliberately copying the generated file into the matching repository path and reviewing the resulting JSON.
 
+Bundled files ship in two shapes. `util.TableToJSON` writes a JSON array for a sequential table but a JSON object for any other table, and `util.JSONToTable` returns that object's keys as strings, so `#` and `ipairs` see nothing. Both loot and spawn loaders therefore decode through `util.JSONToList`, defined in `gamemode/init.lua`, which returns a sequential list in numeric key order for either shape. Decode any new numeric-keyed data file through that helper rather than `util.JSONToTable`. Saved files are sequential from that point on, so `GM:SaveSpawns()` writes the array form.
+
 ## Spawn data
 
 | Item | Value |
@@ -13,11 +15,11 @@ Runtime admin commands write to Garry's Mod's writable `DATA` mount. They do not
 | Owner | `gamemodes/murder_custom/gamemode/sv_spawns.lua` |
 | Bundled path | `data_static/murder/<map>/spawns/spawns.txt` |
 | Runtime path | `data/murder/<map>/spawns/spawns.txt` |
-| Structure | JSON table keyed by numeric IDs; values are serialized Garry's Mod vectors |
+| Structure | JSON array, or an object keyed by numeric IDs; values are serialized Garry's Mod vectors |
 
 `GM:LoadSpawns()` calls `file.ReadDataAndContent`, defined in `gamemode/init.lua`. That helper reads writable `DATA` first, then `data_static/` through the `GAME` mount. Runtime data therefore overrides bundled data.
 
-A non-empty authored spawn list is authoritative. When no authored positions exist and `mu_spawn_dynamic_fallback` is enabled (the default), `GM:InitPostEntity()` collects the map's `info_player_*` entities and a bounded set of positions from already-loaded navmesh components reachable from those native spawns. During play it also retains a bounded map-session pool of positions traversed by living players. For each round, selection prefers map spawn entities, then traversed positions, then navmesh positions, stopping at the first source that provides a valid position at least 512 units from positions already assigned that round; if none meets that separation, it uses the farthest valid candidate. Every candidate is re-grounded and checked for world bounds, water, floor slope, full standing-hull clearance, and non-destructive spawn suitability immediately before use.
+A non-empty authored spawn list is authoritative. When no authored positions exist and `mu_spawn_dynamic_fallback` is enabled (the default), `GM:InitPostEntity()` collects the map's `info_player_*` entities and a bounded set of positions from already-loaded navmesh components reachable from those native spawns. During play it also retains a bounded map-session pool of positions traversed by living players. For each round, selection prefers map spawn entities, then traversed positions, then navmesh positions, stopping at the first source that provides a valid position at least 512 units from positions already assigned that round; if none meets that separation, it uses the farthest valid candidate. Every candidate is re-grounded and checked for world bounds, water, floor slope, full standing-hull clearance, and non-destructive spawn suitability immediately before use. When no candidate validates at all — every authored position blocked, for example — a final pass takes a random position from that list and clears whoever occupies it, so a spawn is always returned while any position exists.
 
 The fallback never generates or saves a navmesh and never writes generated positions to `DATA`. If the map has no navmesh, its first round uses the best valid `info_player_*` positions available; player-traversed positions can improve later rounds. Disabling `mu_spawn_dynamic_fallback` restores native map spawning whenever the authored list is empty.
 
@@ -30,7 +32,7 @@ Spawn administration uses the `mu_spawn_*` commands documented in `gamemodes/mur
 | Owner | `gamemodes/murder_custom/gamemode/sv_loot.lua` |
 | Bundled path | `data_static/murder/<map>/loot.txt` |
 | Runtime path | `data/murder/<map>/loot.txt` |
-| Structure | JSON table keyed by numeric IDs; records contain model, position, angle, and optional material |
+| Structure | JSON array, or an object keyed by numeric IDs; records contain model, position, angle, and optional material |
 
 The loot loader takes the first file found in this order:
 
@@ -40,7 +42,7 @@ The loot loader takes the first file found in this order:
 
 The second path is the literal compatibility path currently used by `sv_loot.lua`; do not silently rewrite it while making unrelated data changes.
 
-During a round, automatic loot makes an immediate spawn attempt after reset and then another every 12 seconds. Every candidate must be more than 256 units from every living player, including stationary/AFK players. Unoccupied authored positions are used first. When none are available and `mu_loot_dynamic_fallback` is enabled (the default), the server tries bounded pools in this order: map-authored item/weapon locations captured before cleanup, map-session positions traversed by living players, then reachable navmesh positions prepared by the spawn subsystem. Each fallback candidate must also be within 1500 units of a living player and is revalidated for world bounds, water, floor slope, clearance, and distance from existing loot before use.
+During a round, automatic loot makes an immediate spawn attempt after reset and then another every 12 seconds. Every candidate must be more than 256 units from every living player, including stationary/AFK players. Unoccupied authored positions are used first. When none are available and `mu_loot_dynamic_fallback` is enabled (the default), the server tries bounded pools in this order: map-authored item/weapon locations captured before cleanup, map-session positions traversed by living players, then reachable navmesh positions prepared by the spawn subsystem. Each fallback candidate must also be within 1500 units of a living player and is revalidated for world bounds, a world (not entity) floor, water, floor slope, clearance, and distance from existing loot before use.
 
 Fallback positions are never written to `DATA`, and traversal samples persist across rounds for the current map session. The server never generates a navmesh at runtime; when no navmesh or map pickup positions exist, play begins with no fallback loot and traversed positions become available as players explore. Automatic spawning pauses at a target between 5 and 12 according to the number of living bystanders; it does not cull existing or admin-respawned loot.
 

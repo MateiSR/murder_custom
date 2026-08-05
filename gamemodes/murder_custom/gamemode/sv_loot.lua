@@ -86,7 +86,7 @@ local function loadLootFileInDir(fileDir)
 	end
 
 	local json = file.Read(filePath, "GAME")
-	local content = util.JSONToTable(json)
+	local content = util.JSONToList(json)
 
 	if content then
 		LootItems = content
@@ -144,6 +144,7 @@ function GM:ResetLoot()
 end
 
 function GM:SpawnLoot()
+	local serial = GetGlobalInt(LOOT_SPAWN_GLOBAL, 0)
 	for k, ent in pairs(ents.FindByClass("mu_loot")) do
 		ent:Remove()
 	end
@@ -152,6 +153,9 @@ function GM:SpawnLoot()
 	for k, data in pairs(LootItems) do
 		self:SpawnLootItem(data)
 	end
+
+	// a bulk respawn is not a gameplay spawn, so it must not pulse the HUD once per item
+	SetGlobalInt(LOOT_SPAWN_GLOBAL, serial)
 end
 
 function GM:SpawnLootItem(data)
@@ -187,7 +191,8 @@ local function findWorldFloor(pos)
 		filter = player.GetAll(),
 		mask = MASK_PLAYERSOLID
 	})
-	if !tr.Hit || tr.StartSolid || tr.HitNormal.z < 0.7 then return end
+	// loot has motion disabled, so a mover as the floor would leave it hanging in the air
+	if !tr.Hit || !tr.HitWorld || tr.StartSolid || tr.HitNormal.z < 0.7 then return end
 	local contents = util.PointContents(tr.HitPos + Vector(0, 0, 8))
 	if bit.band(contents, bit.bor(CONTENTS_WATER, CONTENTS_SLIME)) != 0 then return end
 	return tr.HitPos
@@ -240,9 +245,10 @@ local function isLootAwayFromPlayers(pos)
 	return true
 end
 
-local function canSpawnFallbackLoot(data, activeLoot)
+// returns the grounded position to spawn at, leaving the pooled candidate untouched
+local function fallbackLootPosition(data, activeLoot)
 	local pos = findWorldFloor(data.pos)
-	if !pos || !util.IsInWorld(pos + Vector(0, 0, 8)) || !isLootAwayFromPlayers(pos) then return false end
+	if !pos || !util.IsInWorld(pos + Vector(0, 0, 8)) || !isLootAwayFromPlayers(pos) then return end
 
 	local clearance = util.TraceHull({
 		start = pos + Vector(0, 0, 24),
@@ -251,10 +257,10 @@ local function canSpawnFallbackLoot(data, activeLoot)
 		maxs = Vector(10, 10, 24),
 		mask = MASK_PLAYERSOLID
 	})
-	if clearance.Hit || clearance.StartSolid || clearance.AllSolid then return false end
+	if clearance.Hit || clearance.StartSolid || clearance.AllSolid then return end
 
 	for k, ent in pairs(activeLoot) do
-		if ent:GetPos():DistToSqr(pos) < dynamicLootMinDistance then return false end
+		if ent:GetPos():DistToSqr(pos) < dynamicLootMinDistance then return end
 	end
 
 	local nearPlayer = false
@@ -264,10 +270,9 @@ local function canSpawnFallbackLoot(data, activeLoot)
 			if distance <= playerLootMaxDistance then nearPlayer = true end
 		end
 	end
-	if !nearPlayer then return false end
+	if !nearPlayer then return end
 
-	data.pos = pos
-	return true
+	return pos
 end
 
 local function getLootSpawnData(activeLoot)
@@ -287,13 +292,18 @@ local function getLootSpawnData(activeLoot)
 
 	local sources = {MapLootItems, DynamicLootItems, NavLootItems}
 	for k, items in ipairs(sources) do
-		available = {}
+		local candidates = {}
 		for k, data in ipairs(items) do
-			if !occupied[data] && canSpawnFallbackLoot(data, activeLoot) then
-				table.insert(available, data)
+			if !occupied[data] then
+				local pos = fallbackLootPosition(data, activeLoot)
+				if pos then table.insert(candidates, {data = data, pos = pos}) end
 			end
 		end
-		if #available > 0 then return table.Random(available) end
+		if #candidates > 0 then
+			local pick = table.Random(candidates)
+			pick.data.pos = pick.pos
+			return pick.data
+		end
 	end
 end
 

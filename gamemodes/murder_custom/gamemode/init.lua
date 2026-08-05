@@ -15,6 +15,24 @@ for k, folder in pairs(folders) do
 	end
 end
 
+// util.TableToJSON writes a JSON object for a non-sequential table, and util.JSONToTable gives its
+// keys back as strings. Bundled loot/spawn files ship in both shapes, so decode through this and
+// callers can rely on # and ipairs.
+function util.JSONToList(json)
+	local tbl = util.JSONToTable(json)
+	if !istable(tbl) then return end
+	if #tbl > 0 then return tbl end
+
+	local keys = table.GetKeys(tbl)
+	table.sort(keys, function(a, b) return (tonumber(a) or math.huge) < (tonumber(b) or math.huge) end)
+
+	local list = {}
+	for k, key in ipairs(keys) do
+		table.insert(list, tbl[key])
+	end
+	return list
+end
+
 include("sh_translate.lua")
 include("shared.lua")
 include("weightedrandom.lua")

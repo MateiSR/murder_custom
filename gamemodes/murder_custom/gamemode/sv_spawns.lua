@@ -90,9 +90,20 @@ local function bestSpawnPosition(ply, positions)
 				best = pos
 				bestDistance = distance
 			end
+			// good enough: stop tracing the rest of the pool
+			if distance >= FALLBACK_SPAWN_DISTANCE then break end
 		end
 	end
 	return best, bestDistance
+end
+
+// last resort, matching the pre-fallback behaviour: take any position and clear whoever blocks it
+local function forcedSpawnPosition(ply, positions)
+	if #positions <= 0 then return end
+
+	local pos = positions[math.random(#positions)]
+	GAMEMODE:IsSpawnpointSuitable(ply, spawnEntity(pos), true)
+	return pos
 end
 
 local function chooseFallbackSpawn(ply)
@@ -173,9 +184,9 @@ function GM:PlayerSelectTeamSpawn(TeamID, ply)
 	local authored = TeamSpawns["spawns"] or {}
 	local pos
 	if #authored > 0 then
-		pos = bestSpawnPosition(ply, authored)
+		pos = bestSpawnPosition(ply, authored) || forcedSpawnPosition(ply, authored)
 	elseif self.DynamicSpawnFallback:GetBool() then
-		pos = chooseFallbackSpawn(ply)
+		pos = chooseFallbackSpawn(ply) || forcedSpawnPosition(ply, MapSpawnPositions)
 	end
 	if !pos then return end
 
@@ -217,7 +228,7 @@ function GM:LoadSpawns()
 	for listName, spawnList in pairs(TeamSpawns) do
 		local jason = file.ReadDataAndContent("murder/" .. game.GetMap() .. "/spawns/" .. listName .. ".txt")
 		if jason then
-			local tbl = util.JSONToTable(jason)
+			local tbl = util.JSONToList(jason)
 			if istable(tbl) then
 				TeamSpawns[listName] = tbl
 				networkChange(listName)
