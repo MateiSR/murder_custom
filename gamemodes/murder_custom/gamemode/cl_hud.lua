@@ -75,6 +75,7 @@ end
 
 
 local healthCol = Color(120,255,20)
+local lootIdleCol = Color(220,220,220)
 function GM:HUDPaint()
 	local round = self:GetRound()
 	local client = LocalPlayer()
@@ -383,7 +384,42 @@ function GM:DrawGameHUD(ply)
 		surface.DrawTexturedRect( size * 0.1 + (size - hsize) / 2, ScrH() - size * 1.1 + (size - hsize) / 2, hsize, hsize)
 
 		if LocalPlayer() == ply then
-			drawTextShadow(self.LootCollected or "error", "MersRadialBig", size * 0.6, ScrH() - size * 0.6, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			local loot = self.LootCollected or 0
+			local activeLoot = GetGlobalInt("mu_loot_active", 0)
+			local spawnSerial = GetGlobalInt("mu_loot_spawn_serial", 0)
+			if self.LootHUDRoundStart != self.RoundStart then
+				self.LootHUDRoundStart = self.RoundStart
+				self.LastLootSpawnSerial = spawnSerial
+				self.LootSpawnPulseEnd = nil
+			elseif spawnSerial > (self.LastLootSpawnSerial or spawnSerial) then
+				self.LootSpawnPulseAmount = spawnSerial - self.LastLootSpawnSerial
+				self.LootSpawnPulseEnd = CurTime() + 1.5
+			end
+			self.LastLootSpawnSerial = spawnSerial
+
+			local progress = tostring(loot)
+			if !self:GetAmMurderer() then
+				progress = progress .. "/" .. self:GetNextLootReward(loot)
+			end
+
+			local centerX = size * 0.6
+			local centerY = ScrH() - size * 0.6
+			local progressFont = "MersRadial"
+			surface.SetFont(progressFont)
+			local progressWidth = surface.GetTextSize(progress)
+			if progressWidth > size * 0.72 then progressFont = "MersRadialSmall" end
+			drawTextShadow(progress, progressFont, centerX, centerY - size * 0.1, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+			local activeText = Translator:QuickVar(translate.lootOnMap, "count", tostring(activeLoot))
+			local activeColor = lootIdleCol
+			if self.LootSpawnPulseEnd && self.LootSpawnPulseEnd > CurTime() then
+				local pulseText = "+" .. (self.LootSpawnPulseAmount or 1) .. "  " .. activeText
+				surface.SetFont("MersRadialSmall")
+				local pulseWidth = surface.GetTextSize(pulseText)
+				if pulseWidth <= size * 0.78 then activeText = pulseText end
+				activeColor = healthCol
+			end
+			drawTextShadow(activeText, "MersRadialSmall", centerX, centerY + size * 0.2, activeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 
 		surface.SetFont("MersRadialSmall")

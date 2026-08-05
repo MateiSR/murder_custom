@@ -22,7 +22,7 @@ Round flow starts in `GM:StartNewRound()` in `sv_rounds.lua`. It cleans the map,
 
 | Area | Server owner | Client/entity counterpart | Notes |
 | --- | --- | --- | --- |
-| Loot data and rewards | `gamemode/sv_loot.lua` | `cl_rounds.lua`, `entities/entities/mu_loot/` | Loads/saves positions, periodically spawns loot, grants magnums at thresholds |
+| Loot data and rewards | `gamemode/sv_loot.lua` | `cl_rounds.lua`, `cl_hud.lua`, `entities/entities/mu_loot/` | Prefers authored positions, falls back to validated player-traversed positions, caps active loot, and grants magnums at thresholds |
 | Player spawn positions | `gamemode/sv_spawns.lua` | `cl_spawns.lua` | Loads/saves spawn lists and supports admin visualization |
 
 The data locations and precedence rules are documented in [Data and localization](data.md). Runtime admin edits are written to Garry's Mod `DATA`; they do not modify repository files automatically.
@@ -31,7 +31,7 @@ The data locations and precedence rules are documented in [Data and localization
 
 | Area | Owner | Related code |
 | --- | --- | --- |
-| Main HUD and round-start overlay | `gamemode/cl_hud.lua` | `cl_rounds.lua`, `cl_respawn.lua`, `cl_flashlight.lua` |
+| Main HUD and round-start overlay | `gamemode/cl_hud.lua` | `cl_rounds.lua`, `cl_respawn.lua`, `cl_flashlight.lua`; the health circle shows personal loot progress plus active world loot and briefly pulses after a spawn |
 | Scoreboard | `gamemode/cl_scoreboard.lua` | `sv_adminpanel.lua`, `cl_adminpanel.lua` |
 | End-round board | `gamemode/cl_endroundboard.lua` | `sv_rounds.lua`, `sv_player.lua`, `cl_rounds.lua`, `init.lua`; renders up to three server-selected round highlights |
 | Structured chat | `gamemode/sv_chattext.lua`, `cl_chattext.lua` | Callers constructing `ChatText` messages |

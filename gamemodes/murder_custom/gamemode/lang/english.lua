@@ -6,6 +6,7 @@ pt.knife = "Knife"
 pt.magnum = "Magnum"
 pt.gun = "Gun"
 pt.hands = "Hands"
+pt.lootOnMap = "{count} OUT"
 
 pt.weaponPickerTitle = "Weapon selection"
 pt.weaponPickerHelp = "Your choices are saved for future rounds."

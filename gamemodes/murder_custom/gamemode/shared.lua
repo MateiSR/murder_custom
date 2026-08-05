@@ -19,3 +19,12 @@ GM.Round = {
 	MapSwitch = 4, // 4 waiting for map switch
 	RoundStarting = 5 // 5 waiting to start new round after enough players
 }
+
+function GM:GetNextLootReward(loot)
+	loot = math.max(0, loot or 0)
+	if loot < 5 then return 5 end
+	return (math.floor(loot / 15) + 1) * 15
+end
+
+assert(GM:GetNextLootReward(0) == 5 && GM:GetNextLootReward(5) == 15 && GM:GetNextLootReward(15) == 30,
+	"loot reward thresholds are invalid")

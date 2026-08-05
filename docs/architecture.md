@@ -83,6 +83,8 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 
 `mu_corpse_inspection` writes the ragdoll entity, a float containing its current age in seconds, a two-bit cause (`0` unknown, `1` slashed, `2` shot), then the dragged boolean. The client advances the received age locally while the inspection remains visible.
 
+The server publishes the current world-loot count and round-local spawn sequence through the replicated global integers `mu_loot_active` and `mu_loot_spawn_serial`. The HUD reads them for the in-circle active count and a reliable brief spawn pulse; loot spawning and rewards remain server-authoritative.
+
 `weapon_mers_base.lua` also defines an integer `Variant` network variable for its SWEP instances. When a player equips a knife or magnum, the server validates and applies that player's archived user-info selection; clients then apply the matching view model, world model, skin, material, animations, and sounds. The thrown `mu_knife` entity carries its own integer `Variant` so throwing and recovering a knife preserves its appearance until it is equipped again.
 
 Find every registration, sender, and receiver with:

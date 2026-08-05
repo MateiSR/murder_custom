@@ -106,6 +106,7 @@ function GM:InitPostEntityAndMapCleanup()
 	for k, ent in pairs(ents.FindByClass("mu_loot")) do
 		ent:Remove()
 	end
+	self:ResetLoot()
 	-- self:SpawnLoot()
 end
 

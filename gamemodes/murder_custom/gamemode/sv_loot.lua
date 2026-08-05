@@ -41,6 +41,23 @@ local FruitModels = {
 	"models/props_junk/watermelon01.mdl"
 }
 
+local ACTIVE_LOOT_GLOBAL = "mu_loot_active"
+local LOOT_SPAWN_GLOBAL = "mu_loot_spawn_serial"
+local DYNAMIC_LOOT_MODEL = "models/props_lab/clipboard.mdl"
+local LOOT_SAMPLE_INTERVAL = 2
+local LOOT_SPAWN_INTERVAL = 12
+local DynamicLootItems = {}
+local dynamicLootMinDistance = 192 ^ 2
+local playerLootMinDistance = 256 ^ 2
+local playerLootMaxDistance = 1500 ^ 2
+
+local function lootSpawnDue(nextSpawn, now)
+	return !nextSpawn || nextSpawn < now
+end
+
+assert(lootSpawnDue(nil, 0) && !lootSpawnDue(12, 12) && lootSpawnDue(12, 12.01),
+	"loot spawn cadence is invalid")
+
 util.AddNetworkString("GrabLoot")
 util.AddNetworkString("SetLoot")
 
@@ -59,7 +76,7 @@ local function loadLootFileInDir(fileDir)
 	local json = file.Read(filePath, "GAME")
 	local content = util.JSONToTable(json)
 
-	if json then
+	if content then
 		LootItems = content
 		print("Successfully loaded loot data from "..filePath.."!")
 		return true
@@ -103,10 +120,23 @@ function GM:CountLootItems()
 	return #LootItems
 end
 
+local function setActiveLootCount(count)
+	SetGlobalInt(ACTIVE_LOOT_GLOBAL, count)
+end
+
+function GM:ResetLoot()
+	table.Empty(DynamicLootItems)
+	self.LastSampleLoot = nil
+	self.LastSpawnLoot = nil
+	setActiveLootCount(0)
+	SetGlobalInt(LOOT_SPAWN_GLOBAL, 0)
+end
+
 function GM:SpawnLoot()
 	for k, ent in pairs(ents.FindByClass("mu_loot")) do
 		ent:Remove()
 	end
+	setActiveLootCount(0)
 
 	for k, data in pairs(LootItems) do
 		self:SpawnLootItem(data)
@@ -126,23 +156,134 @@ function GM:SpawnLootItem(data)
 	ent:SetAngles(data.angle)
 	ent:Spawn()
 
+	if data.dynamic then
+		local pos = ent:GetPos()
+		pos.z = pos.z - ent:OBBMins().z
+		ent:SetPos(pos)
+	end
+
 	ent.LootData = data
-	-- print(data.pos, data.model, ent)
+	setActiveLootCount(#ents.FindByClass("mu_loot"))
+	SetGlobalInt(LOOT_SPAWN_GLOBAL, GetGlobalInt(LOOT_SPAWN_GLOBAL, 0) + 1)
 
 	return ent
 end
 
-function GM:LootThink()
-	if self:GetRound() == 1 then
+local function findWorldFloor(pos, filter)
+	local tr = util.TraceLine({
+		start = pos + Vector(0, 0, 16),
+		endpos = pos - Vector(0, 0, 48),
+		filter = filter,
+		mask = MASK_PLAYERSOLID
+	})
+	if !tr.Hit || !tr.HitWorld then return end
+	return tr.HitPos
+end
 
-		if !self.LastSpawnLoot || self.LastSpawnLoot < CurTime() then
-			self.LastSpawnLoot = CurTime() + 12
+local function rememberDynamicLootPosition(pos)
+	for k, data in ipairs(DynamicLootItems) do
+		if data.pos:DistToSqr(pos) < dynamicLootMinDistance then return end
+	end
 
-			local data = table.Random(LootItems)
-			if data then
-				self:SpawnLootItem(data)
-			end
+	// ponytail: bounded linear pool; use a spatial grid only if the cap grows beyond 64.
+	if #DynamicLootItems >= 64 then table.remove(DynamicLootItems, 1) end
+	table.insert(DynamicLootItems, {
+		model = DYNAMIC_LOOT_MODEL,
+		pos = pos,
+		angle = Angle(0, math.random(0, 359), 0),
+		dynamic = true
+	})
+end
+
+local function sampleDynamicLootPositions()
+	for k, ply in pairs(team.GetPlayers(2)) do
+		if ply:Alive() && !ply.Frozen && ply:IsOnGround() && ply:WaterLevel() < 2 then
+			local pos = findWorldFloor(ply:GetPos(), ply)
+			if pos then rememberDynamicLootPosition(pos) end
 		end
+	end
+end
+
+local function canSpawnDynamicLoot(data, activeLoot)
+	local pos = findWorldFloor(data.pos)
+	if !pos || !util.IsInWorld(pos + Vector(0, 0, 8)) then return false end
+
+	local clearance = util.TraceHull({
+		start = pos + Vector(0, 0, 24),
+		endpos = pos + Vector(0, 0, 1),
+		mins = Vector(-10, -10, 0),
+		maxs = Vector(10, 10, 24),
+		mask = MASK_PLAYERSOLID
+	})
+	if clearance.Hit || clearance.StartSolid || clearance.AllSolid then return false end
+
+	for k, ent in pairs(activeLoot) do
+		if ent:GetPos():DistToSqr(pos) < dynamicLootMinDistance then return false end
+	end
+
+	local nearPlayer = false
+	for k, ply in pairs(team.GetPlayers(2)) do
+		if ply:Alive() then
+			local distance = ply:GetPos():DistToSqr(pos)
+			if distance < playerLootMinDistance then return false end
+			if distance <= playerLootMaxDistance then nearPlayer = true end
+		end
+	end
+	if !nearPlayer then return false end
+
+	data.pos = pos
+	return true
+end
+
+local function getLootSpawnData(activeLoot)
+	local occupied = {}
+	for k, ent in pairs(activeLoot) do
+		if ent.LootData then occupied[ent.LootData] = true end
+	end
+
+	local available = {}
+	for k, data in pairs(LootItems) do
+		if data.model && data.pos && data.angle && !occupied[data] then
+			table.insert(available, data)
+		end
+	end
+	if #available > 0 then return table.Random(available) end
+
+	for k, data in ipairs(DynamicLootItems) do
+		if !occupied[data] && canSpawnDynamicLoot(data, activeLoot) then
+			table.insert(available, data)
+		end
+	end
+	return table.Random(available)
+end
+
+local function getMaxActiveLoot()
+	local livingBystanders = 0
+	for k, ply in pairs(team.GetPlayers(2)) do
+		if ply:Alive() && !ply:GetMurderer() then
+			livingBystanders = livingBystanders + 1
+		end
+	end
+	return math.Clamp(livingBystanders * 2, 5, 12)
+end
+
+function GM:LootThink()
+	if self:GetRound() != self.Round.Playing then return end
+
+	if !self.LastSampleLoot || self.LastSampleLoot < CurTime() then
+		self.LastSampleLoot = CurTime() + LOOT_SAMPLE_INTERVAL
+		sampleDynamicLootPositions()
+	end
+
+	if lootSpawnDue(self.LastSpawnLoot, CurTime()) then
+		self.LastSpawnLoot = CurTime() + LOOT_SPAWN_INTERVAL
+
+		local activeLoot = ents.FindByClass("mu_loot")
+		setActiveLootCount(#activeLoot)
+		if #activeLoot >= getMaxActiveLoot() then return end
+
+		local data = getLootSpawnData(activeLoot)
+		if data then self:SpawnLootItem(data) end
 	end
 end
 
@@ -189,19 +330,16 @@ local function giveMagnum(ply)
 end
 
 function GM:PlayerPickupLoot(ply, ent)
+	local nextReward = self:GetNextLootReward(ply.LootCollected)
 	ply.LootCollected = ply.LootCollected + 1
 
-	if !ply:GetMurderer() then
-		if ply.LootCollected == 5 then
-			giveMagnum(ply)
-		end
-		if ply.LootCollected % 15 == 0 then
-			giveMagnum(ply)
-		end
+	if !ply:GetMurderer() && ply.LootCollected == nextReward then
+		giveMagnum(ply)
 	end
 
 	ply:EmitSound("ambient/levels/canals/windchime2.wav", 100, math.random(40,160))
 	ent:Remove()
+	setActiveLootCount(math.max(0, GetGlobalInt(ACTIVE_LOOT_GLOBAL, 0) - 1))
 
 	net.Start("GrabLoot")
 	net.WriteUInt(ply.LootCollected, 32)
