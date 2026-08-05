@@ -83,6 +83,7 @@ function GM:Initialize()
 end
 
 function GM:InitPostEntity() 
+	self:PrepareFallbackSpawns()
 	local canAdd = self:CountLootItems() <= 0
 	for k, ent in pairs(ents.FindByClass("mu_loot")) do
 		if canAdd then
@@ -93,6 +94,7 @@ function GM:InitPostEntity()
 end
 
 function GM:InitPostEntityAndMapCleanup() 
+	self:ResetRoundSpawns()
 	for k, ent in pairs(ents.GetAll()) do
 		if ent:IsWeapon() || ent:GetClass():match("^weapon_") then
 			ent:Remove()

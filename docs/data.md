@@ -17,6 +17,10 @@ Runtime admin commands write to Garry's Mod's writable `DATA` mount. They do not
 
 `GM:LoadSpawns()` calls `file.ReadDataAndContent`, defined in `gamemode/init.lua`. That helper reads writable `DATA` first, then `data_static/` through the `GAME` mount. Runtime data therefore overrides bundled data.
 
+A non-empty authored spawn list is authoritative. When no authored positions exist and `mu_spawn_dynamic_fallback` is enabled (the default), `GM:InitPostEntity()` collects the map's `info_player_*` entities and a bounded set of positions from already-loaded navmesh components reachable from those native spawns. During play it also retains a bounded map-session pool of positions traversed by living players. For each round, selection prefers map spawn entities, then traversed positions, then navmesh positions, stopping at the first source that provides a valid position at least 512 units from positions already assigned that round; if none meets that separation, it uses the farthest valid candidate. Every candidate is re-grounded and checked for world bounds, water, floor slope, full standing-hull clearance, and non-destructive spawn suitability immediately before use.
+
+The fallback never generates or saves a navmesh and never writes generated positions to `DATA`. If the map has no navmesh, its first round uses the best valid `info_player_*` positions available; player-traversed positions can improve later rounds. Disabling `mu_spawn_dynamic_fallback` restores native map spawning whenever the authored list is empty.
+
 Spawn administration uses the `mu_spawn_*` commands documented in `gamemodes/murder_custom/commands.txt`; saves always target `DATA`.
 
 ## Loot data

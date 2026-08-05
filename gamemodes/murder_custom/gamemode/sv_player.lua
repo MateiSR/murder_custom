@@ -203,39 +203,6 @@ function plyMeta:CalculateSpeed()
 	self:SetJumpPower(jumppower)
 end
 
-local function isValid() return true end
-local function getPos(self) return self.pos end
-
-local function generateSpawnEntities(spawnList)
-	local tbl = {}
-
-	for k, pos in pairs(spawnList) do
-		local t = {}
-		t.IsValid = isValid
-		t.GetPos = getPos
-		t.pos = pos
-		table.insert(tbl, t)
-	end
-
-	return tbl
-end
-
-function GM:PlayerSelectTeamSpawn( TeamID, pl )
-	local spawnPoints = generateSpawnEntities(TeamSpawns["spawns"])
-	if ( !spawnPoints || table.Count( spawnPoints ) == 0 ) then return end
-	
-	local spawnPoint = nil
-	for i = 0, 6 do
-		local spawnPoint = table.Random( spawnPoints )
-		if ( GAMEMODE:IsSpawnpointSuitable( pl, spawnPoint, i == 6 ) ) then
-			return spawnPoint
-		end
-	end
-	
-	return spawnPoint
-end
-
-
 function GM:PlayerDeathSound()
 	-- don't play sound
 	return true
