@@ -94,6 +94,11 @@ function GM:HUDPaint()
 		end
 	end
 
+	if round == self.Round.Playing && self.RoundEndTime && hook.Run("HUDShouldDraw", "MurderRoundTimer") != false then
+		local seconds = math.max(0, math.ceil(self.RoundEndTime - CurTime()))
+		drawTextShadow(string.format("%d:%02d", math.floor(seconds / 60), seconds % 60), "MersRadial", ScrW() / 2, 10, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	end
+
 	if client:Team() == 2 then
 		if !client:Alive() then
 			self:RenderRespawnText()

@@ -17,6 +17,8 @@ net.Receive("SetRound", function (length)
 	local start = net.ReadDouble()
 	GAMEMODE.RoundStage = r
 	GAMEMODE.RoundStart = start
+	GAMEMODE.RoundEndTime = net.ReadDouble()
+	if GAMEMODE.RoundEndTime == 0 then GAMEMODE.RoundEndTime = nil end
 
 	GAMEMODE.RoundSettings = {}
 	local settings = net.ReadUInt(8)

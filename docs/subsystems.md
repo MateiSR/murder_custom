@@ -16,7 +16,7 @@ Use this guide to find the owner of a behavior. Read the start file, its paired 
 | Ragdolls | `gamemode/sv_ragdoll.lua` | `cl_ragdoll.lua` | Death ragdoll creation and cleanup |
 | Corpse inspection | `gamemode/sv_player.lua` | `cl_hud.lua` | Living bystanders press `+use` on a nearby death ragdoll to see victim, elapsed death time, cause, and drag evidence |
 
-Round flow starts in `GM:StartNewRound()` in `sv_rounds.lua`. It cleans the map, resets players, selects a murderer through `WeightedRandom`, gives a random bystander the magnum, and networks the new state. Player death handling routes from `sv_player.lua` back into round win checks.
+Round flow starts in `GM:StartNewRound()` in `sv_rounds.lua`. It cleans the map, resets players, selects a murderer through `WeightedRandom`, gives a random bystander the magnum, and networks the new state plus the optional `mu_roundtime` deadline. Player death handling routes from `sv_player.lua` back into round win checks; an expired deadline gives the bystanders the win.
 
 ## Loot and map spawns
 

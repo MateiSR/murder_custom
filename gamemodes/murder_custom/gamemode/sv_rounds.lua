@@ -42,6 +42,7 @@ end
 function GM:SetRound(round)
 	self.RoundStage = round
 	self.RoundTime = CurTime()
+	self.RoundEndTime = round == self.Round.Playing && self.RoundTimeLimit:GetInt() > 0 && self.RoundTime + self.RoundTimeLimit:GetInt() or nil
 
 	self.RoundSettings = {}
 
@@ -56,6 +57,7 @@ function GM:NetworkRound(ply)
 	net.Start("SetRound")
 	net.WriteUInt(self.RoundStage, 8)
 	net.WriteDouble(self.RoundTime)
+	net.WriteDouble(self.RoundEndTime or 0)
 
 	if self.RoundSettings then
 		net.WriteUInt(1, 8)
@@ -152,6 +154,12 @@ function GM:RoundCheckForWin()
 	// check we have a murderer
 	if !IsValid(murderer) then
 		self:EndTheRound(3, murderer)
+		return
+	end
+
+	// bystanders win if the optional round timer expires
+	if self.RoundEndTime && self.RoundEndTime <= CurTime() then
+		self:EndTheRound(2, murderer)
 		return
 	end
 

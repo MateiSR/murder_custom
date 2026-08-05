@@ -41,6 +41,7 @@ Server ConVars
 	mu_moveafktospectator <0/1> - Should we move AFK players to spectator on round end
 	mu_show_spectate_info <0/1> - Should show players name and color to spectators
 	mu_roundlimit <number> - Number of rounds we should play before map change
+	mu_roundtime <seconds> - Round time limit for the next round; 0 disables it, timeout gives bystanders the win
 
 Client ConVars
 	mu_knife_variant <number> - Saved murderer weapon cosmetic

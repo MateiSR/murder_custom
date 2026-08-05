@@ -52,7 +52,7 @@ Round constants live in `shared.lua`; transitions live in `sv_rounds.lua` and ar
 | `MapSwitch` | 4 | Round limit reached; waiting for map change |
 | `RoundStarting` | 5 | Enough players; countdown before start |
 
-`GM:StartNewRound()` cleans the map, chooses a weighted murderer, respawns/freezes players, assigns one initial magnum, resets per-round state, and enters `Playing`. `GM:RoundCheckForWin()` ends the round when the murderer wins, dies, or leaves.
+`GM:StartNewRound()` cleans the map, chooses a weighted murderer, respawns/freezes players, assigns one initial magnum, resets per-round state, and enters `Playing`. `GM:RoundCheckForWin()` ends the round when the murderer wins, dies, leaves, or the optional `mu_roundtime` limit expires; a timeout gives the bystanders the win.
 
 ## Network contracts
 
@@ -60,7 +60,7 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 
 | Message | Server side | Client side | Purpose |
 | --- | --- | --- | --- |
-| `SetRound`, `DeclareWinner` | `sv_rounds.lua` | `cl_rounds.lua`, `cl_endroundboard.lua` | Round state, result, and up to three server-selected highlight records |
+| `SetRound`, `DeclareWinner` | `sv_rounds.lua` | `cl_rounds.lua`, `cl_endroundboard.lua` | Round state and optional deadline, result, and up to three server-selected highlight records |
 | `your_are_a_murderer` | `sv_murderer.lua` | `cl_murderer.lua` | Local role state |
 | `GrabLoot`, `SetLoot` | `sv_loot.lua` | `cl_rounds.lua` | Local loot count |
 | `spectating_status` | `sv_spectate.lua` | `cl_spectate.lua` | Custom spectate state |
@@ -78,6 +78,8 @@ Payload write/read order is an API. Change the sender and receiver in the same e
 | `mu_knife_charge` | `weapon_mu_knife.lua` | Same shared SWEP | Thrown-knife charge UI |
 | `TTT_ConfirmUseTButton` | `entities/entities/ttt_traitor_button/init.lua` | `shared.lua` client branch in the same entity | Successful map-button feedback |
 | `translator_language` | `sh_translate.lua` server branch | Same file, client branch | Selected gameplay language |
+
+`SetRound` writes the eight-bit state, state-start timestamp, optional round deadline (`0` when disabled), settings block, optional pre-round start timestamp, then unfreeze duration.
 
 `mu_corpse_inspection` writes the ragdoll entity, a float containing its current age in seconds, a two-bit cause (`0` unknown, `1` slashed, `2` shot), then the dragged boolean. The client advances the received age locally while the inspection remains visible.
 
