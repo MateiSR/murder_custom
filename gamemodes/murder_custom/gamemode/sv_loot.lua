@@ -51,12 +51,22 @@ local dynamicLootMinDistance = 192 ^ 2
 local playerLootMinDistance = 256 ^ 2
 local playerLootMaxDistance = 1500 ^ 2
 
+GM.DynamicLootFallback = CreateConVar("mu_loot_dynamic_fallback", 1, bit.bor(FCVAR_NOTIFY),
+	"Use player-traversed positions when authored loot positions are unavailable")
+
 local function lootSpawnDue(nextSpawn, now)
 	return !nextSpawn || nextSpawn < now
 end
 
 assert(lootSpawnDue(nil, 0) && !lootSpawnDue(12, 12) && lootSpawnDue(12, 12.01),
 	"loot spawn cadence is invalid")
+
+local function isPlayerDistanceSafe(distance)
+	return distance > playerLootMinDistance
+end
+
+assert(!isPlayerDistanceSafe(playerLootMinDistance) && isPlayerDistanceSafe(playerLootMinDistance + 1),
+	"loot player distance is invalid")
 
 util.AddNetworkString("GrabLoot")
 util.AddNetworkString("SetLoot")
@@ -204,9 +214,16 @@ local function sampleDynamicLootPositions()
 	end
 end
 
+local function isLootAwayFromPlayers(pos)
+	for k, ply in pairs(player.GetAll()) do
+		if ply:Alive() && !isPlayerDistanceSafe(ply:GetPos():DistToSqr(pos)) then return false end
+	end
+	return true
+end
+
 local function canSpawnDynamicLoot(data, activeLoot)
 	local pos = findWorldFloor(data.pos)
-	if !pos || !util.IsInWorld(pos + Vector(0, 0, 8)) then return false end
+	if !pos || !util.IsInWorld(pos + Vector(0, 0, 8)) || !isLootAwayFromPlayers(pos) then return false end
 
 	local clearance = util.TraceHull({
 		start = pos + Vector(0, 0, 24),
@@ -222,10 +239,9 @@ local function canSpawnDynamicLoot(data, activeLoot)
 	end
 
 	local nearPlayer = false
-	for k, ply in pairs(team.GetPlayers(2)) do
+	for k, ply in pairs(player.GetAll()) do
 		if ply:Alive() then
 			local distance = ply:GetPos():DistToSqr(pos)
-			if distance < playerLootMinDistance then return false end
 			if distance <= playerLootMaxDistance then nearPlayer = true end
 		end
 	end
@@ -243,11 +259,12 @@ local function getLootSpawnData(activeLoot)
 
 	local available = {}
 	for k, data in pairs(LootItems) do
-		if data.model && data.pos && data.angle && !occupied[data] then
+		if data.model && data.pos && data.angle && !occupied[data] && isLootAwayFromPlayers(data.pos) then
 			table.insert(available, data)
 		end
 	end
 	if #available > 0 then return table.Random(available) end
+	if !GAMEMODE.DynamicLootFallback:GetBool() then return end
 
 	for k, data in ipairs(DynamicLootItems) do
 		if !occupied[data] && canSpawnDynamicLoot(data, activeLoot) then
@@ -270,7 +287,7 @@ end
 function GM:LootThink()
 	if self:GetRound() != self.Round.Playing then return end
 
-	if !self.LastSampleLoot || self.LastSampleLoot < CurTime() then
+	if self.DynamicLootFallback:GetBool() && (!self.LastSampleLoot || self.LastSampleLoot < CurTime()) then
 		self.LastSampleLoot = CurTime() + LOOT_SAMPLE_INTERVAL
 		sampleDynamicLootPositions()
 	end

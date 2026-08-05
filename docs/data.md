@@ -36,7 +36,7 @@ The loot loader takes the first file found in this order:
 
 The second path is the literal compatibility path currently used by `sv_loot.lua`; do not silently rewrite it while making unrelated data changes.
 
-During a round, automatic loot makes an immediate spawn attempt after reset and then another every 12 seconds. Unoccupied authored positions are used first. When none are available, the server falls back to a bounded pool of world-floor positions recently traversed by living players, revalidating clearance and player distance before each spawn. These generated positions are round-local and are never written to `DATA`. Automatic spawning pauses at a target between 5 and 12 according to the number of living bystanders; it does not cull existing or admin-respawned loot.
+During a round, automatic loot makes an immediate spawn attempt after reset and then another every 12 seconds. Every candidate must be more than 256 units from every living player, including stationary/AFK players. Unoccupied authored positions are used first. When none are available and `mu_loot_dynamic_fallback` is enabled (the default), the server falls back to a bounded pool of world-floor positions recently traversed by living players, revalidating clearance and player distance before each spawn. These generated positions are round-local and are never written to `DATA`. Automatic spawning pauses at a target between 5 and 12 according to the number of living bystanders; it does not cull existing or admin-respawned loot.
 
 Loot administration uses the `mu_loot_*` commands. `mu_loot_reload` can force `--data`, `--embedded`, or `--static`; saves target `DATA`.
 
