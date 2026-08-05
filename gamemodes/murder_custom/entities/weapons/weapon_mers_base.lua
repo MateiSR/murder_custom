@@ -116,6 +116,7 @@ function SWEP:Equip(owner)
 		index = 1
 	end
 	self:SetVariant(index)
+	self:ApplyVariant(index)
 end
 
 function SWEP:SetNetHoldType(name)
