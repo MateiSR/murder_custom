@@ -46,13 +46,15 @@ local LOOT_SPAWN_GLOBAL = "mu_loot_spawn_serial"
 local DYNAMIC_LOOT_MODEL = "models/props_lab/clipboard.mdl"
 local LOOT_SAMPLE_INTERVAL = 2
 local LOOT_SPAWN_INTERVAL = 12
+local MapLootItems = {}
 local DynamicLootItems = {}
+local NavLootItems = {}
 local dynamicLootMinDistance = 192 ^ 2
 local playerLootMinDistance = 256 ^ 2
 local playerLootMaxDistance = 1500 ^ 2
 
 GM.DynamicLootFallback = CreateConVar("mu_loot_dynamic_fallback", 1, bit.bor(FCVAR_NOTIFY),
-	"Use player-traversed positions when authored loot positions are unavailable")
+	"Use map, player-traversed, and navmesh positions when authored loot positions are unavailable")
 
 local function lootSpawnDue(nextSpawn, now)
 	return !nextSpawn || nextSpawn < now
@@ -135,7 +137,6 @@ local function setActiveLootCount(count)
 end
 
 function GM:ResetLoot()
-	table.Empty(DynamicLootItems)
 	self.LastSampleLoot = nil
 	self.LastSpawnLoot = nil
 	setActiveLootCount(0)
@@ -179,25 +180,27 @@ function GM:SpawnLootItem(data)
 	return ent
 end
 
-local function findWorldFloor(pos, filter)
+local function findWorldFloor(pos)
 	local tr = util.TraceLine({
 		start = pos + Vector(0, 0, 16),
 		endpos = pos - Vector(0, 0, 48),
-		filter = filter,
+		filter = player.GetAll(),
 		mask = MASK_PLAYERSOLID
 	})
-	if !tr.Hit || !tr.HitWorld then return end
+	if !tr.Hit || tr.StartSolid || tr.HitNormal.z < 0.7 then return end
+	local contents = util.PointContents(tr.HitPos + Vector(0, 0, 8))
+	if bit.band(contents, bit.bor(CONTENTS_WATER, CONTENTS_SLIME)) != 0 then return end
 	return tr.HitPos
 end
 
-local function rememberDynamicLootPosition(pos)
-	for k, data in ipairs(DynamicLootItems) do
+local function rememberLootPosition(items, pos)
+	for k, data in ipairs(items) do
 		if data.pos:DistToSqr(pos) < dynamicLootMinDistance then return end
 	end
 
 	// ponytail: bounded linear pool; use a spatial grid only if the cap grows beyond 64.
-	if #DynamicLootItems >= 64 then table.remove(DynamicLootItems, 1) end
-	table.insert(DynamicLootItems, {
+	if #items >= 64 then table.remove(items, 1) end
+	table.insert(items, {
 		model = DYNAMIC_LOOT_MODEL,
 		pos = pos,
 		angle = Angle(0, math.random(0, 359), 0),
@@ -205,11 +208,27 @@ local function rememberDynamicLootPosition(pos)
 	})
 end
 
+function GM:PrepareLootFallbacks()
+	table.Empty(MapLootItems)
+	table.Empty(DynamicLootItems)
+	table.Empty(NavLootItems)
+
+	for k, ent in ipairs(ents.GetAll()) do
+		local class = ent:GetClass()
+		if ent:IsWeapon() || class:match("^weapon_") || class:match("^item_") then
+			rememberLootPosition(MapLootItems, ent:GetPos())
+		end
+	end
+	for k, pos in ipairs(self:GetNavFallbackPositions()) do
+		rememberLootPosition(NavLootItems, pos)
+	end
+end
+
 local function sampleDynamicLootPositions()
 	for k, ply in pairs(team.GetPlayers(2)) do
 		if ply:Alive() && !ply.Frozen && ply:IsOnGround() && ply:WaterLevel() < 2 then
-			local pos = findWorldFloor(ply:GetPos(), ply)
-			if pos then rememberDynamicLootPosition(pos) end
+			local pos = findWorldFloor(ply:GetPos())
+			if pos then rememberLootPosition(DynamicLootItems, pos) end
 		end
 	end
 end
@@ -221,7 +240,7 @@ local function isLootAwayFromPlayers(pos)
 	return true
 end
 
-local function canSpawnDynamicLoot(data, activeLoot)
+local function canSpawnFallbackLoot(data, activeLoot)
 	local pos = findWorldFloor(data.pos)
 	if !pos || !util.IsInWorld(pos + Vector(0, 0, 8)) || !isLootAwayFromPlayers(pos) then return false end
 
@@ -266,12 +285,16 @@ local function getLootSpawnData(activeLoot)
 	if #available > 0 then return table.Random(available) end
 	if !GAMEMODE.DynamicLootFallback:GetBool() then return end
 
-	for k, data in ipairs(DynamicLootItems) do
-		if !occupied[data] && canSpawnDynamicLoot(data, activeLoot) then
-			table.insert(available, data)
+	local sources = {MapLootItems, DynamicLootItems, NavLootItems}
+	for k, items in ipairs(sources) do
+		available = {}
+		for k, data in ipairs(items) do
+			if !occupied[data] && canSpawnFallbackLoot(data, activeLoot) then
+				table.insert(available, data)
+			end
 		end
+		if #available > 0 then return table.Random(available) end
 	end
-	return table.Random(available)
 end
 
 local function getMaxActiveLoot()

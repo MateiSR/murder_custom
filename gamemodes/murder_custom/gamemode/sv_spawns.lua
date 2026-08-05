@@ -161,6 +161,10 @@ function GM:PrepareFallbackSpawns()
 	end
 end
 
+function GM:GetNavFallbackPositions()
+	return NavSpawnPositions
+end
+
 function GM:ResetRoundSpawns()
 	table.Empty(RoundSpawnPositions)
 end

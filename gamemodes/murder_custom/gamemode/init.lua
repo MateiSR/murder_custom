@@ -90,6 +90,7 @@ function GM:InitPostEntity()
 			self:AddLootItem(ent)
 		end
 	end
+	self:PrepareLootFallbacks()
 	self:InitPostEntityAndMapCleanup()
 end
 

@@ -44,7 +44,7 @@ Server ConVars
 	mu_roundlimit <number> - Number of rounds we should play before map change
 	mu_roundtime <seconds> - Round time limit for the next round; 0 disables it, timeout gives bystanders the win
 	mu_spawn_dynamic_fallback <0/1> - Use map, player-traversed, and navmesh spawn positions when authored spawns are unavailable; defaults to 1
-	mu_loot_dynamic_fallback <0/1> - Use generated player-traversed loot positions when authored positions are unavailable; defaults to 1
+	mu_loot_dynamic_fallback <0/1> - Use map pickup, player-traversed, and navmesh loot positions when authored positions are unavailable; defaults to 1
 
 Client ConVars
 	mu_knife_variant <number> - Saved murderer weapon cosmetic

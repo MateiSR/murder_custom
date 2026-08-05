@@ -25,7 +25,7 @@ Counter-Strike: Source content is required for maps, textures, and models.
 1. Recursively calls `AddCSLuaFile` for `cl_`, `sh_`, and shared Lua files.
 2. Explicitly includes `sh_translate.lua`, `shared.lua`, `weightedrandom.lua`, then each `sv_` subsystem.
 3. Creates server ConVars and registers global lifecycle hooks.
-4. On initialization, loads spawn data, starts round state, loads loot, and loads the map list; after map entities initialize, prepares native-map and navmesh spawn fallback candidates.
+4. On initialization, loads spawn data, starts round state, loads loot, and loads the map list; after map entities initialize, prepares native-map and navmesh spawn candidates plus map-pickup and navmesh loot fallbacks.
 5. On each server tick, dispatches round, murderer, loot, and flashlight work.
 
 Server execution order is the explicit `include(...)` list, not filename order. Adding a server subsystem requires adding it to this list in the correct dependency position.

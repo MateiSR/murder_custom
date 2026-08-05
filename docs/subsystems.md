@@ -22,7 +22,7 @@ Round flow starts in `GM:StartNewRound()` in `sv_rounds.lua`. It cleans the map,
 
 | Area | Server owner | Client/entity counterpart | Notes |
 | --- | --- | --- | --- |
-| Loot data and rewards | `gamemode/sv_loot.lua` | `cl_rounds.lua`, `cl_hud.lua`, `entities/entities/mu_loot/` | Prefers authored positions, falls back to validated player-traversed positions, caps active loot, and grants magnums at thresholds |
+| Loot data and rewards | `gamemode/sv_loot.lua` | `cl_rounds.lua`, `cl_hud.lua`, `entities/entities/mu_loot/` | Prefers authored positions, then validated map-pickup/traversed/navmesh fallbacks, caps active loot, and grants magnums at thresholds |
 | Player spawn positions | `gamemode/sv_spawns.lua` | `cl_spawns.lua` | Loads/saves authored lists, selects validated map/traversed/navmesh fallbacks, and supports admin visualization |
 
 The data locations and precedence rules are documented in [Data and localization](data.md). Runtime admin edits are written to Garry's Mod `DATA`; they do not modify repository files automatically.
